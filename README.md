@@ -10,6 +10,8 @@ JPAN-CLI provides several tools:
 
 * `jpan-cli ping` - Test connectivity to a remote SCION host using SCMP echo packets
 
+* `jpan-cli ping-responder` - Run a local server that responds to incoming SCION pings
+
 * `jpan-cli showpaths` - Display paths to a SCION AS
 
 * `jpan-cli traceroute` - Trace the SCION route to a remote SCION AS using SCMP traceroute packets
@@ -36,16 +38,15 @@ To get command line help, the tool can be executed with:
 java -jar jpan-cli-exec.jar help
 ```
 
+## Address
 
-# Download Assignments
+## Ping
 
-The tool
-parses [Anapayas ISD/AS assignment website](https://docs.anapaya.net/en/latest/resources/isd-as-assignments/)
-and writes the result to a local file `isd-as-assignments.csv`.
-Note: the `isd-as-assignments.csv` output file can be directly used as input file for the PingRepeat
+## Ping Responder
 
-# Ping All
+## Showpaths
 
+## Traceroute
 
 # Troubleshooting
 
