@@ -21,11 +21,11 @@ JPAN-CLI provides several tools:
 ## Execution
 
 All tools can be run from the executable jar file which is available in
-the [GitHub Releases section](https://github.com/netsec-ethz/jpan-cli/releases/download/v0.1.0/jpan-cli-exec.jar).
+the [GitHub Releases section](https://github.com/netsec-ethz/jpan-cli/releases/download/v0.1.0/jpan-cli.jar).
 It can be executed with:
 
 ```
-java -jar jpan-cli-exec.jar [tool-command]
+java -jar jpan-cli.jar [tool-command]
 ```
 
 See also the troubleshooting section below in case of issues.
@@ -35,7 +35,7 @@ See also the troubleshooting section below in case of issues.
 To get command line help, the tool can be executed with:
 
 ```
-java -jar jpan-cli-exec.jar help
+java -jar jpan-cli.jar help
 ```
 
 ## Address
@@ -57,5 +57,5 @@ following property (
 the example works only for `ethz.ch`):
 
 ```
-java -Dorg.scion.dnsSearchDomains=ethz.ch. -jar jpan-cli-exec.jar
+java -Dorg.scion.dnsSearchDomains=ethz.ch. -jar jpan-cli.jar
 ```

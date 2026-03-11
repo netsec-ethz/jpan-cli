@@ -263,7 +263,7 @@
                                     <goal>shade</goal>
                                 </goals>
                                 <configuration>
-                                    <outputFile>target/jpan-cli-exec.jar</outputFile>
+                                    <outputFile>target/jpan-cli.jar</outputFile>
 <!--                                    <shadedArtifactAttached>true</shadedArtifactAttached>-->
 <!--                                    <shadedClassifierName>executable</shadedClassifierName>-->
                                     <transformers>

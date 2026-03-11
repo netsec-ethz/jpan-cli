@@ -14,6 +14,12 @@
 
 package org.scion.cli.util;
 
+import org.scion.jpan.ScionSocketAddress;
+import org.scion.jpan.ScionUtil;
+import org.scion.jpan.internal.IPHelper;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -131,5 +137,43 @@ public class Util {
       exit2("Error: --" + argName + " requires a string argument");
     }
     return args.remove(1);
+  }
+
+  public static ScionSocketAddress parseScionAddress(List<String> args) {
+    String s = args.get(1);
+    try {
+      String[] addrParts = s.split(",");
+      check(addrParts.length == 2, "Expected `,`");
+      long isdIa = ScionUtil.parseIA(addrParts[0]);
+
+      String addrStr;
+      if (addrParts[1].startsWith("[")) {
+        check(addrParts[1].startsWith("["), "Expected `[` before address");
+        check(addrParts[1].endsWith("]"), "Expected `]` after address");
+        addrStr = addrParts[1].substring(1, addrParts[1].length() - 1).trim();
+      } else {
+        addrStr = addrParts[1].trim();
+      }
+      check(!addrStr.isEmpty(), "Address is empty");
+
+      byte[] addrBytes = IPHelper.toByteArray(addrStr);
+      check(addrBytes != null, "Address string is not a legal address");
+      InetAddress inetAddr = InetAddress.getByAddress(addrStr, addrBytes);
+      return ScionSocketAddress.from(null, isdIa, inetAddr, 30041);
+    } catch (IndexOutOfBoundsException | IllegalArgumentException | UnknownHostException e) {
+      println("ERROR parsing address {}: error=\"{}\"", s, e.getMessage());
+    }
+
+    if (args.size() != 1) {
+      exit2("Error: could not parse destination address: " + args.get(1));
+    }
+    args.remove(1);
+    return null;
+  }
+
+  private static void check(boolean pass, String msg) {
+    if (!pass) {
+      throw new IllegalArgumentException(msg);
+    }
   }
 }

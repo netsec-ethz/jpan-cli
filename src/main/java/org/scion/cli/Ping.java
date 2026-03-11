@@ -20,11 +20,10 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import org.scion.cli.util.Util;
 import org.scion.jpan.*;
-import org.scion.jpan.internal.util.IPHelper;
+import org.scion.jpan.internal.IPHelper;
 
 import static org.scion.cli.util.Util.*;
 
@@ -50,12 +49,29 @@ public class Ping {
   private static long localIsdAs = 0;
   private static InetAddress localIP = null;
   private static int payloadSize = 0;
+  private static InetAddress dstIA;
+  private static InetAddress dstIP;
+  private static InetAddress dstPort;
+  private static ScionSocketAddress dstAddress;
+  private static String dstUrl;
 
   public static void main(String... args) throws IOException {
     parseArgs(args);
     System.setProperty(Constants.PROPERTY_SHIM, startShim ? "true" : "false"); // disable SHIM
     try {
-      run();
+      ScionService service = Scion.defaultService();
+      int n;
+      if (dstUrl != null) {
+        n = run(service.lookupPaths(dstUrl, Constants.SCMP_PORT));
+      } else if (dstAddress != null) {
+        n = run(service.getPaths(dstAddress.getIsdAs(), dstAddress.getAddress(), dstAddress.getPort()));
+      } else {
+        exit2("Error: missing address or --url");
+        throw new IllegalArgumentException();
+      }
+      if (n == 0) {
+        System.exit(1);
+      }
     } finally {
       Scion.closeDefault();
     }
@@ -64,6 +80,12 @@ public class Ping {
   private static void parseArgs(String[] argsArray) {
     List<String> args = new ArrayList<>(Arrays.asList(argsArray));
     while (!args.isEmpty()) {
+      if (args.size() == 1) {
+        dstAddress = parseScionAddress(args);
+        if (dstAddress != null) {
+          continue;
+        }
+      }
       switch (args.get(0)) {
         case "-c":
         case "--count":
@@ -92,6 +114,9 @@ public class Ping {
         case "--shim":
           startShim = true;
           break;
+        case "--url":
+          dstUrl = parseString("url", args);
+          break;
         case "--port":
           localPort = parseInt("port", args);
           break;
@@ -104,12 +129,7 @@ public class Ping {
     }
   }
 
-  public static int run() throws IOException {
-    ScionService service = Scion.defaultService();
-    return runDemo(service.lookupPaths("ethz.ch", Constants.SCMP_PORT));
-  }
-
-  private static int runDemo(List<Path> paths) throws IOException {
+  private static int run(List<Path> paths) throws IOException {
     Path path = paths.get(0);
     ByteBuffer data = ByteBuffer.allocate(0);
 
@@ -156,7 +176,7 @@ public class Ping {
     String nl = System.lineSeparator();
     String sb = "Using path:" + nl + "  Hops: " + ScionUtil.toStringPath(path.getMetadata());
     sb += " MTU: " + path.getMetadata().getMtu();
-    sb += " NextHop: " + path.getMetadata().getLocalInterface().getAddress() + nl;
+    sb += " NextHop: " + path.getMetadata().getInterface().getAddress() + nl;
     println(sb);
   }
 
