@@ -91,7 +91,6 @@ public class Address {
     ScionService service = Scion.defaultService();
     Iterator<InetAddress> iter = IPHelper.getInterfaceIPs().iterator();
     boolean found = false;
-    println("Local address:");
     while (iter.hasNext()) {
       InetAddress ip = iter.next();
       if (ip.isLoopbackAddress()) {

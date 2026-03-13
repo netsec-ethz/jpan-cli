@@ -17,6 +17,7 @@ package org.scion.cli;
 import java.io.*;
 import java.net.*;
 import java.nio.ByteBuffer;
+import java.rmi.server.ExportException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -60,14 +61,11 @@ public class Ping {
       ScionService service = Scion.defaultService();
       int n;
       if (dstUrl != null) {
-        n = run(service.lookupPaths(dstUrl, Constants.SCMP_PORT));
+        run(service.lookupPaths(dstUrl, Constants.SCMP_PORT));
       } else if (dstAddress != null) {
-        n = run(service.getPaths(dstAddress.getIsdAs(), dstAddress.getInetAddress(), Constants.SCMP_PORT));
+        run(service.getPaths(dstAddress.getIsdAs(), dstAddress.getInetAddress(), Constants.SCMP_PORT));
       } else {
         throw new ExitCodeException(2, "Error: missing address or --url");
-      }
-      if (n == 0) {
-        throw new ExitCodeException(1);
       }
     } finally {
       Scion.closeDefault();
@@ -120,6 +118,7 @@ public class Ping {
           if (dstAddress == null) {
             dstAddress = parseScionAddress(args);
             if (dstAddress != null) {
+              args.remove(0);
               continue;
             }
           }
@@ -129,7 +128,7 @@ public class Ping {
     }
   }
 
-  private static int run(List<Path> paths) throws IOException {
+  private static void run(List<Path> paths) throws IOException {
     Path path = paths.get(0);
     ByteBuffer data = ByteBuffer.allocate(payloadSize);
     for (int i = 0; i < payloadSize; i++) {
@@ -143,7 +142,7 @@ public class Ping {
       localAddress = channel.getLocalAddress().getAddress().getHostAddress();
     }
 
-    int n = 0;
+    int nTimeouts = 0;
     ScmpSender.Builder builder = ScmpSender.newBuilder();
     if (localPort != null) {
       builder.setLocalPort(localPort);
@@ -167,8 +166,7 @@ public class Ping {
         echoMsgStr += ": scmp_seq=" + msg.getSequenceNumber();
         if (msg.isTimedOut()) {
           echoMsgStr += " Timed out after";
-        } else {
-          n++;
+          nTimeouts++;
         }
         echoMsgStr += " time=" + millis + "ms";
         println(echoMsgStr);
@@ -177,7 +175,9 @@ public class Ping {
         }
       }
     }
-    return n;
+    if (nTimeouts > 0) {
+      throw new ExitCodeException(1, "Number of timeouts: " + nTimeouts);
+    }
   }
 
   private static void printPath(Path path) {

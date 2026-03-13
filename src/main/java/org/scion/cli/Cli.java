@@ -28,6 +28,7 @@ public class Cli {
 
   public static void main(String[] args) {
     handleExit(() -> run(args));
+    // handleExit(() -> run(new String[] {"traceroute", "66-2:0:18,10.0.0.1"}));
   }
 
   public static void run(String[] args) {

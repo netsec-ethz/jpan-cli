@@ -93,6 +93,7 @@ public class Traceroute {
           if (dstAddress == null) {
             dstAddress = parseScionAddress(args);
             if (dstAddress != null) {
+              args.remove(0);
               continue;
             }
           }
@@ -117,7 +118,7 @@ public class Traceroute {
     if (paths.isEmpty()) {
       String src = ScionUtil.toStringIA(service.getLocalIsdAs());
       String dst = ScionUtil.toStringIA(dstAddress.getIsdAs());
-      throw new IOException("No path found from " + src + " to " + dst);
+      throw new ExitCodeException(2, "No path found from " + src + " to " + dst);
     }
     Path path = paths.get(0);
 
@@ -140,10 +141,10 @@ public class Traceroute {
       printPath(path);
 
       List<Scmp.TracerouteMessage> results = sender.sendTracerouteRequest(path);
-      int n = 0;
+      int nTimeouts = 0;
       for (Scmp.TracerouteMessage msg : results) {
-        if (!msg.isTimedOut()) {
-          n++;
+        if (msg.isTimedOut()) {
+          nTimeouts++;
         }
         String millis = String.format("%.4f", msg.getNanoSeconds() / (double) 1_000_000);
         String out = "" + msg.getSequenceNumber();
@@ -153,8 +154,8 @@ public class Traceroute {
         out += " " + millis + "ms";
         println(out);
       }
-      if (n > 0) {
-        throw new ExitCodeException(1, "Number of timeouts: " + n);
+      if (nTimeouts > 0) {
+        throw new ExitCodeException(1, "Number of timeouts: " + nTimeouts);
       }
     }
   }
