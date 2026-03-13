@@ -17,7 +17,6 @@
 
 package org.scion.cli;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Locale;
 
@@ -25,61 +24,43 @@ import static org.scion.cli.util.Util.*;
 
 public class Cli {
 
-  private static final String VERSION = "0.1.0 (using JPAN 0.6.2-SNAPSHOT)";
+  private static final String VERSION = "0.1.0 (using JPAN 0.6.1)";
 
   public static void main(String[] args) {
     handleExit(() -> run(args));
   }
 
-  public static void run(String[] args) throws IOException {
+  public static void run(String[] args) {
     checkArgs(args, 1, Integer.MAX_VALUE);
     String mode = args[0].toLowerCase(Locale.ROOT);
     String[] newArgs = Arrays.copyOfRange(args, 1, args.length);
     switch (mode) {
       case "address":
-      {
-        checkArgs(args, 1, 1); // TODO min/max args
         Address.main(newArgs);
         return;
-      }
       case "h":
       case "help":
-        {
-          printHelp(args.length == 1 ? "" : args[1]);
-          break;
-        }
+        printHelp(args.length == 1 ? "" : args[1]);
+        return;
       case "ping":
-        {
-          Ping.main(newArgs);
-          return;
-        }
+        Ping.main(newArgs);
+        return;
       case "pr":
       case "ping-responder":
-      {
-        checkArgs(args, 1, 1);
         PingResponder.main(newArgs);
         return;
-      }
       case "sp":
       case "showpaths":
-        {
-          checkArgs(args, 1, 1);
-          Showpaths.main(newArgs);
-          return;
-        }
+        Showpaths.main(newArgs);
+        return;
       case "tr":
       case "traceroute":
-      {
-        checkArgs(args, 1, 1);
         Traceroute.main(newArgs);
         return;
-      }
       case "v":
       case "version":
-        {
-          printVersion();
-          return;
-        }
+        printVersion();
+        return;
       default:
         printUsage();
         System.exit(1);
@@ -170,7 +151,8 @@ public class Cli {
     println("When the --count option is set, ping sends the specified number of SCMP echo packets");
     println("and reports back the statistics.");
     println("");
-    //    println("When the --healthy-only option is set, ping first determines healthy paths through probing and");
+    //    println("When the --healthy-only option is set, ping first determines healthy paths
+    // through probing and");
     //    println("chooses amongst them.");
     //    println("");
     println("If no reply packet is received at all, ping will exit with code 1.");
@@ -190,7 +172,8 @@ public class Cli {
     println("Flags:");
     println("  -c, --count uint16           total number of packets to send");
     //    println("      --epic                   Enable EPIC for path probing.");
-    //    println("      --format string          Specify the output format (human|json|yaml) (default \"human\")");
+    //    println("      --format string          Specify the output format (human|json|yaml)
+    // (default \"human\")");
     //    println("      --healthy-only           only use healthy paths");
     println("  -h, --help                   help for ping");
     //    println("  -i, --interactive            interactive mode");
@@ -198,16 +181,22 @@ public class Cli {
     println("      --isd-as isd-as          The local ISD-AS to use. (default 0-0)");
     println("  -l, --local ip               Local IP address to listen on. (default invalid IP)");
     println("      --log.level string       Console logging level verbosity (debug|info|error)");
-    //    println("      --max-mtu                choose the payload size such that the sent SCION packet including the SCION Header,");
-    //    println("                               SCMP echo header and payload are equal to the MTU of the path. This flag overrides the");
+    //    println("      --max-mtu                choose the payload size such that the sent SCION
+    // packet including the SCION Header,");
+    //    println("                               SCMP echo header and payload are equal to the MTU
+    // of the path. This flag overrides the");
     //    println("                               'payload_size' and 'packet_size' flags.");
     //    println("      --no-color               disable colored output");
-    //    println("      --packet-size uint       number of bytes to be sent including the SCION Header and SCMP echo header,");
-    //    println("                               the desired size must provide enough space for the required headers. This flag");
+    //    println("      --packet-size uint       number of bytes to be sent including the SCION
+    // Header and SCMP echo header,");
+    //    println("                               the desired size must provide enough space for the
+    // required headers. This flag");
     //    println("                               overrides the 'payload_size' flag.");
     println("      --port <port             Use specified local port");
-    println("  -s, --payload-size uint      number of bytes to be sent in addition to the SCION Header and SCMP echo header;");
-    println("                               the total size of the packet is still variable size due to the variable size of");
+    println(
+        "  -s, --payload-size uint      number of bytes to be sent in addition to the SCION Header and SCMP echo header;");
+    println(
+        "                               the total size of the packet is still variable size due to the variable size of");
     //    println("      --refresh                set refresh flag for path request");
     println("      --sciond string          SCION Daemon address. (default \"127.0.0.1:30255\")");
     //    println("      --sequence string        Space separated list of hop predicates");
@@ -234,18 +223,21 @@ public class Cli {
     println("  jpan-cli traceroute 1-ff00:0:110,10.0.0.1");
     println("");
     println("Flags:");
-//    println("      --epic                   Enable EPIC.");
-//    println("      --format string          Specify the output format (human|json|yaml) (default \"human\")");
+    //    println("      --epic                   Enable EPIC.");
+    //    println("      --format string          Specify the output format (human|json|yaml)
+    // (default \"human\")");
     println("  -h, --help                   help for traceroute");
-//    println("  -i, --interactive            interactive mode");
-//    println("      --isd-as isd-as          The local ISD-AS to use. (default 0-0)");
-//    println("  -l, --local ip               Local IP address to listen on. (default invalid IP)");
-//    println("      --log.level string       Console logging level verbosity (debug|info|error)");
-//    println("      --no-color               disable colored output");
+    //    println("  -i, --interactive            interactive mode");
+    //    println("      --isd-as isd-as          The local ISD-AS to use. (default 0-0)");
+    //    println("  -l, --local ip               Local IP address to listen on. (default invalid
+    // IP)");
+    //    println("      --log.level string       Console logging level verbosity
+    // (debug|info|error)");
+    //    println("      --no-color               disable colored output");
     println("      --port <port>            Use specified local port");
-//    println("      --refresh                set refresh flag for path request");
+    //    println("      --refresh                set refresh flag for path request");
     println("      --sciond string          SCION Daemon address. (default \"127.0.0.1:30255\")");
-//    println("      --sequence string        Space separated list of hop predicates");
+    //    println("      --sequence string        Space separated list of hop predicates");
     println("      --shim                   Start with SHIM enabled (default disabled).");
     println("      --timeout duration       timeout per packet (default 1s)");
     println("      --url url                Use and resolve a url as destination address");
@@ -276,19 +268,23 @@ public class Cli {
     println("  jpan-cli showpaths 1-ff00:0:110 --extended");
     println("  jpan-cli showpaths 1-ff00:0:110 --local 127.0.0.55 --json");
     println("  jpan-cli showpaths 1-ff00:0:111 --sequence=\"0-0#2 0*\" # outgoing IfID=2");
-    println("  jpan-cli showpaths 1-ff00:0:111 --sequence=\"0* 0-0#41\" # incoming IfID=41 at dstIA");
-    println("  jpan-cli showpaths 1-ff00:0:111 --sequence=\"0* 1-ff00:0:112 0*\" # 1-ff00:0:112 on the path");
+    println(
+        "  jpan-cli showpaths 1-ff00:0:111 --sequence=\"0* 0-0#41\" # incoming IfID=41 at dstIA");
+    println(
+        "  jpan-cli showpaths 1-ff00:0:111 --sequence=\"0* 1-ff00:0:112 0*\" # 1-ff00:0:112 on the path");
     println("  jpan-cli showpaths 1-ff00:0:110 --no-probe");
     println("");
     println("Flags:");
     println("      --epic                   Enable EPIC.");
     println("  -e, --extended               Show extended path meta data information");
-    println("      --format string          Specify the output format (human|json|yaml) (default \"human\")");
+    println(
+        "      --format string          Specify the output format (human|json|yaml) (default \"human\")");
     println("  -h, --help                   help for showpaths");
     println("      --isd-as isd-as          The local ISD-AS to use. (default 0-0)");
     println("  -l, --local ip               Local IP address to listen on. (default invalid IP)");
     println("      --log.level string       Console logging level verbosity (debug|info|error)");
-    println("  -m, --maxpaths int           Maximum number of paths that are displayed (default 10)");
+    println(
+        "  -m, --maxpaths int           Maximum number of paths that are displayed (default 10)");
     println("      --no-color               disable colored output");
     println("      --no-probe               Do not probe the paths and print the health status");
     println("  -r, --refresh                Set refresh flag for SCION Daemon path request");
@@ -316,7 +312,8 @@ public class Cli {
     // println("  jpan-cli ping-responder 1-ff00:0:110 --local 127.0.0.55");
     println("");
     println("Flags:");
-    // println("  -l, --local ip               Local IP address to listen on. (default invalid IP)");
+    // println("  -l, --local ip               Local IP address to listen on. (default invalid
+    // IP)");
     println("      --port <port>            Use specified local port.");
   }
 

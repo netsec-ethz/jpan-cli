@@ -28,32 +28,18 @@ It can be executed with:
 java -jar jpan-cli.jar [tool-command]
 ```
 
-See also the troubleshooting section below in case of issues.
-
-# Help
-
-To get command line help, the tool can be executed with:
+For example, to get command line help, the tool can be executed with:
 
 ```
 java -jar jpan-cli.jar help
 ```
 
-## Address
-
-## Ping
-
-## Ping Responder
-
-## Showpaths
-
-## Traceroute
-
 # Troubleshooting
 
-## No answers received
+## No ping/traceroute answers received
 
 In some ASes, border routers will send return packets to port 30041. To receive these packets,
-please start the tool with `--port 30041`. This is applicable to `ping` and `traceroute`.
+please start the tool with `--port 30041`.
 
 
 ## No DNS search domain found. Please check your /etc/resolv.conf or similar.
