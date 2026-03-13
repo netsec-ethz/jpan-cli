@@ -14,6 +14,8 @@
 
 package org.scion.cli;
 
+import static org.scion.cli.util.Util.*;
+
 import java.io.*;
 import java.net.*;
 import java.time.Duration;
@@ -23,11 +25,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import org.scion.cli.util.ExitCodeException;
 import org.scion.jpan.*;
-
-import static org.scion.cli.util.Util.*;
 
 /**
  * This demo mimics the "scion ping" command available in scionproto (<a
@@ -49,8 +48,6 @@ public class Showpaths {
   private static InetSocketAddress daemon;
   private static Long isdAs;
   private static boolean extended = false;
-
-
 
   public static void main(String... args) {
     handleExit(() -> run(args));
@@ -78,7 +75,7 @@ public class Showpaths {
           throw new ExitCodeException(0);
         case "--isd-as":
           localIsdAs =
-                  tryParse("isd-as", args.get(1), () -> ScionUtil.parseIA(parseString("isd-as", args)));
+              tryParse("isd-as", args.get(1), () -> ScionUtil.parseIA(parseString("isd-as", args)));
           break;
         case "-l":
         case "--local":

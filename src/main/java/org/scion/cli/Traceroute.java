@@ -14,17 +14,16 @@
 
 package org.scion.cli;
 
+import static org.scion.cli.util.Util.*;
+
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import org.scion.cli.util.ExitCodeException;
 import org.scion.jpan.*;
 import org.scion.jpan.internal.ScionAddress;
-
-import static org.scion.cli.util.Util.*;
 
 /**
  * This demo mimics the "scion traceroute" command available in scionproto (<a
@@ -68,7 +67,7 @@ public class Traceroute {
           throw new ExitCodeException(0);
         case "--isd-as":
           localIsdAs =
-                  tryParse("isd-as", args.get(1), () -> ScionUtil.parseIA(parseString("isd-as", args)));
+              tryParse("isd-as", args.get(1), () -> ScionUtil.parseIA(parseString("isd-as", args)));
           break;
         case "-l":
         case "--local":
@@ -110,7 +109,8 @@ public class Traceroute {
     if (dstUrl != null) {
       paths = service.lookupPaths(dstUrl, Constants.SCMP_PORT);
     } else if (dstAddress != null) {
-      paths = service.getPaths(dstAddress.getIsdAs(), dstAddress.getInetAddress(), Constants.SCMP_PORT);
+      paths =
+          service.getPaths(dstAddress.getIsdAs(), dstAddress.getInetAddress(), Constants.SCMP_PORT);
     } else {
       throw new ExitCodeException(2, "Error: missing address or --url");
     }

@@ -14,16 +14,15 @@
 
 package org.scion.cli.util;
 
-import org.scion.jpan.ScionUtil;
-import org.scion.jpan.internal.IPHelper;
-import org.scion.jpan.internal.ScionAddress;
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.Callable;
+import org.scion.jpan.ScionUtil;
+import org.scion.jpan.internal.IPHelper;
+import org.scion.jpan.internal.ScionAddress;
 
 public class Util {
 
@@ -123,7 +122,8 @@ public class Util {
     try {
       return fn.call();
     } catch (Exception e) {
-      throw new ExitCodeException(2, "Error: Invalid --" + argName + " value: " + argValue + " -> " + e.getMessage());
+      throw new ExitCodeException(
+          2, "Error: Invalid --" + argName + " value: " + argValue + " -> " + e.getMessage());
     }
   }
 

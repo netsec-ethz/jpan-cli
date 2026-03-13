@@ -17,10 +17,10 @@
 
 package org.scion.cli;
 
+import static org.scion.cli.util.Util.*;
+
 import java.util.Arrays;
 import java.util.Locale;
-
-import static org.scion.cli.util.Util.*;
 
 public class Cli {
 

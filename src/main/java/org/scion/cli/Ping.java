@@ -14,19 +14,18 @@
 
 package org.scion.cli;
 
+import static org.scion.cli.util.Util.*;
+
 import java.io.*;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import org.scion.cli.util.ExitCodeException;
 import org.scion.cli.util.Util;
 import org.scion.jpan.*;
 import org.scion.jpan.internal.ScionAddress;
-
-import static org.scion.cli.util.Util.*;
 
 /**
  * This demo mimics the "scion ping" command available in scionproto (<a
@@ -61,7 +60,9 @@ public class Ping {
       if (dstUrl != null) {
         run(service.lookupPaths(dstUrl, Constants.SCMP_PORT));
       } else if (dstAddress != null) {
-        run(service.getPaths(dstAddress.getIsdAs(), dstAddress.getInetAddress(), Constants.SCMP_PORT));
+        run(
+            service.getPaths(
+                dstAddress.getIsdAs(), dstAddress.getInetAddress(), Constants.SCMP_PORT));
       } else {
         throw new ExitCodeException(2, "Error: missing address or --url");
       }
@@ -130,7 +131,7 @@ public class Ping {
     Path path = paths.get(0);
     ByteBuffer data = ByteBuffer.allocate(payloadSize);
     for (int i = 0; i < payloadSize; i++) {
-      data.put((byte)i);
+      data.put((byte) i);
     }
 
     String localAddress;

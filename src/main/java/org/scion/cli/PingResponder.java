@@ -14,17 +14,16 @@
 
 package org.scion.cli;
 
+import static org.scion.cli.util.Util.*;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import org.scion.cli.util.ExitCodeException;
-import org.scion.jpan.*;
 import org.scion.cli.util.Util;
-
-import static org.scion.cli.util.Util.*;
+import org.scion.jpan.*;
 
 /** A simple echo responder that responds to SCMP echo requests. */
 public class PingResponder {
