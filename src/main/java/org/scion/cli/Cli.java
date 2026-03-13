@@ -55,18 +55,18 @@ public class Cli {
         }
       case "sp":
       case "showpaths":
-      {
-        checkArgs(args, 1, 1);
-        Showpaths.main(newArgs);
-        return;
-      }
+        {
+          checkArgs(args, 1, 1);
+          Showpaths.main(newArgs);
+          return;
+        }
       case "pr":
       case "ping-responder":
-      {
-        checkArgs(args, 1, 1);
-        PingResponder.main(newArgs);
-        return;
-      }
+        {
+          checkArgs(args, 1, 1);
+          PingResponder.main(newArgs);
+          return;
+        }
       case "version":
         {
           printVersion();
@@ -309,7 +309,7 @@ public class Cli {
     println("");
     println("Flags:");
     // println("  -l, --local ip               Local IP address to listen on. (default invalid IP)");
-    println("      --port <port>            Use specified local port (default 30041).");
+    println("      --port <port>            Use specified local port.");
   }
 
   private static void printSequenceHelp() {
