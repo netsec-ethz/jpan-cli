@@ -38,7 +38,7 @@ java -jar jpan-cli.jar help
 
 * In JPAN 0.6.1, the SCMP Responder will always return packets to 30041, regardless of their 
   actual source port, see JPAN issue [#233](https://github.com/scionproto-contrib/jpan/issues/233).
-* https://github.com/netsec-ethz/jpan-cli/issues/2
+* `showpaths` flags https://github.com/netsec-ethz/jpan-cli/issues/2
 
 # Troubleshooting
 
