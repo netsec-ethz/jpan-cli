@@ -100,9 +100,6 @@ public class Traceroute {
       }
       args.remove(0);
     }
-    if (dstAddress == null) {
-      throw new ExitCodeException(2, "Please provide a destination address.");
-    }
   }
 
   public static void run() throws IOException {

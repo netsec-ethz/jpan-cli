@@ -36,6 +36,13 @@ public class Cli {
     String mode = args[0].toLowerCase(Locale.ROOT);
     String[] newArgs = Arrays.copyOfRange(args, 1, args.length);
     switch (mode) {
+      case "address":
+      {
+        checkArgs(args, 1, 1); // TODO min/max args
+        Address.main(newArgs);
+        return;
+      }
+      case "h":
       case "help":
         {
           printHelp(args.length == 1 ? "" : args[1]);
@@ -46,13 +53,13 @@ public class Cli {
           Ping.main(newArgs);
           return;
         }
-      case "tr":
-      case "traceroute":
-        {
-          checkArgs(args, 1, 1);
-          Traceroute.main(newArgs);
-          return;
-        }
+      case "pr":
+      case "ping-responder":
+      {
+        checkArgs(args, 1, 1);
+        PingResponder.main(newArgs);
+        return;
+      }
       case "sp":
       case "showpaths":
         {
@@ -60,13 +67,14 @@ public class Cli {
           Showpaths.main(newArgs);
           return;
         }
-      case "pr":
-      case "ping-responder":
-        {
-          checkArgs(args, 1, 1);
-          PingResponder.main(newArgs);
-          return;
-        }
+      case "tr":
+      case "traceroute":
+      {
+        checkArgs(args, 1, 1);
+        Traceroute.main(newArgs);
+        return;
+      }
+      case "v":
       case "version":
         {
           printVersion();

@@ -109,7 +109,9 @@ public class Util {
     try {
       runner.run();
     } catch (ExitCodeException e) {
-      println(e.getMessage());
+      if (e.getMessage() != null && !e.getMessage().isEmpty()) {
+        println(e.getMessage());
+      }
       System.exit(e.exitCode());
     } catch (Exception e) {
       e.printStackTrace();

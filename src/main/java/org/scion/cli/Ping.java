@@ -127,9 +127,6 @@ public class Ping {
       }
       args.remove(0);
     }
-    if (dstAddress == null) {
-      throw new ExitCodeException(2, "Please provide a destination address.");
-    }
   }
 
   private static int run(List<Path> paths) throws IOException {

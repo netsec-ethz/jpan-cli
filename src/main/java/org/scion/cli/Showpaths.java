@@ -52,7 +52,7 @@ public class Showpaths {
 
 
 
-  public static void main(String... args) throws IOException {
+  public static void main(String... args) {
     handleExit(() -> run(args));
   }
 
