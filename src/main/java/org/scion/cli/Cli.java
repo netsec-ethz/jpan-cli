@@ -101,8 +101,7 @@ public class Cli {
   }
 
   private static void printVersion() {
-    println("jpan-cli");
-    println("Version: " + VERSION);
+    println("jpan-cli version: " + VERSION);
   }
 
   private static void printUsage() {
@@ -210,7 +209,7 @@ public class Cli {
     println("'traceroute' traces the SCION path to a remote AS using");
     println("SCMP traceroute packets.");
     println("");
-    println("If any packet is dropped, traceroute will exit with code 1."); // TODO
+    println("If any packet is dropped, traceroute will exit with code 1.");
     println("On other errors, traceroute will exit with code 2.");
     //    printSequenceHelp();
     println("");

@@ -17,7 +17,6 @@ package org.scion.cli;
 import java.io.*;
 import java.net.*;
 import java.nio.ByteBuffer;
-import java.rmi.server.ExportException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -59,7 +58,6 @@ public class Ping {
     }
     try {
       ScionService service = Scion.defaultService();
-      int n;
       if (dstUrl != null) {
         run(service.lookupPaths(dstUrl, Constants.SCMP_PORT));
       } else if (dstAddress != null) {
@@ -176,7 +174,11 @@ public class Ping {
       }
     }
     if (nTimeouts > 0) {
-      throw new ExitCodeException(1, "Number of timeouts: " + nTimeouts);
+      String msg = "";
+      if (localPort == null || localPort != 30041) {
+        msg = ". Try using \"--port 30041\"";
+      }
+      throw new ExitCodeException(1, "Number of timeouts: " + nTimeouts + msg);
     }
   }
 

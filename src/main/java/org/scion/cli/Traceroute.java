@@ -155,7 +155,11 @@ public class Traceroute {
         println(out);
       }
       if (nTimeouts > 0) {
-        throw new ExitCodeException(1, "Number of timeouts: " + nTimeouts);
+        String msg = "";
+        if (localPort == null || localPort != 30041) {
+          msg = ". Try using \"--port 30041\"";
+        }
+        throw new ExitCodeException(1, "Number of timeouts: " + nTimeouts + msg);
       }
     }
   }
