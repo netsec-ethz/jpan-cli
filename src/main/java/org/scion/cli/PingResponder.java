@@ -39,11 +39,16 @@ public class PingResponder {
 
   public static void run(String[] args) throws IOException {
     parseArgs(args);
+    if (localPort == 30041) {
+      System.setProperty(Constants.PROPERTY_SHIM, "false"); // disable SHIM
+    }
 
     try (ScmpResponder responder = Scmp.newResponderBuilder().setLocalPort(localPort).build()) {
       responder.setScmpErrorListener(PingResponder::logError);
       responder.setOption(ScionSocketOptions.SCION_API_THROW_PARSER_FAILURE, true);
       responder.setScmpEchoListener(PingResponder::log);
+      println("Starting ping responder on port: " + localPort);
+      println("Stop with \"ctrl-c\"");
       responder.start();
     }
   }
@@ -77,9 +82,9 @@ public class PingResponder {
         "Received: "
             + msg.getTypeCode().getText()
             + " from "
-            + msg.getPath().getRemoteAddress()
-            + "via ");
-    Util.println(ScionUtil.toStringPath(msg.getPath().getMetadata()));
+            + msg.getPath().getRemoteAddress().getHostAddress()
+            + " via ");
+    Util.println(ScionUtil.toStringPath(msg.getPath().getRawPath()));
     return true;
   }
 
