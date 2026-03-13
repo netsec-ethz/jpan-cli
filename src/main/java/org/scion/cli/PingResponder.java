@@ -14,31 +14,63 @@
 
 package org.scion.cli;
 
-import static org.scion.cli.util.Util.PRINT;
-import static org.scion.cli.util.Util.println;
-
 import java.io.IOException;
+import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.scion.cli.util.ExitCodeException;
 import org.scion.jpan.*;
 import org.scion.cli.util.Util;
+import org.scion.jpan.internal.IPHelper;
+
+import static org.scion.cli.util.Util.*;
 
 /** A simple echo responder that responds to SCMP echo requests. */
 public class PingResponder {
 
   private static int localPort = 30041;
+  private static InetAddress localIP = null;
 
   public static void main(String[] args) throws IOException {
-    PRINT = true;
+    handleExit(() -> run(args));
+  }
 
-    try (ScmpResponder responder =
-        Scmp.newResponderBuilder().setLocalPort(localPort).build()) {
-      responder.setScmpErrorListener(PingResponder::printError);
+  public static void run(String[] args) throws IOException {
+    parseArgs(args);
+
+    try (ScmpResponder responder = Scmp.newResponderBuilder().setLocalPort(localPort).build()) {
+      responder.setScmpErrorListener(PingResponder::logError);
       responder.setOption(ScionSocketOptions.SCION_API_THROW_PARSER_FAILURE, true);
-      responder.setScmpEchoListener(PingResponder::print);
+      responder.setScmpEchoListener(PingResponder::log);
       responder.start();
     }
   }
 
-  private static boolean print(Scmp.EchoMessage msg) {
+  private static void parseArgs(String[] argsArray) {
+    List<String> args = new ArrayList<>(Arrays.asList(argsArray));
+    while (!args.isEmpty()) {
+      switch (args.get(0)) {
+        case "--local":
+          localIP = parseIP("local", args);
+          break;
+        case "--help":
+          Cli.printUsagePingResponder();
+          throw new ExitCodeException(0);
+        case "--port":
+          localPort = parseInt("port", args);
+          break;
+        default:
+          Util.println("Unknown option: " + args.get(0));
+          Cli.printUsagePing();
+          System.exit(1);
+      }
+      args.remove(0);
+    }
+  }
+
+  private static boolean log(Scmp.EchoMessage msg) {
     Util.print(
         "Received: "
             + msg.getTypeCode().getText()
@@ -49,7 +81,7 @@ public class PingResponder {
     return true;
   }
 
-  private static void printError(Scmp.Message msg) {
+  private static void logError(Scmp.Message msg) {
     println("ERROR: " + msg.getTypeCode().getText());
   }
 }

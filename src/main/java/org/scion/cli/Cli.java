@@ -17,6 +17,8 @@
 
 package org.scion.cli;
 
+import org.scion.cli.util.ExitCodeException;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Locale;
@@ -28,6 +30,10 @@ public class Cli {
   private static final String VERSION = "0.1.0 (using JPAN 0.6.2-SNAPSHOT)";
 
   public static void main(String[] args) throws IOException {
+    handleExit(() -> run(args));
+  }
+
+  public static void run(String[] args) throws IOException {
     checkArgs(args, 1, Integer.MAX_VALUE);
     String mode = args[0].toLowerCase(Locale.ROOT);
     String[] newArgs = Arrays.copyOfRange(args, 1, args.length);
@@ -35,7 +41,7 @@ public class Cli {
       case "help":
         {
           printHelp(args.length == 1 ? "" : args[1]);
-          return;
+          break;
         }
       case "ping":
         {
@@ -56,6 +62,7 @@ public class Cli {
         Showpaths.main(newArgs);
         return;
       }
+      case "pr":
       case "ping-responder":
       {
         checkArgs(args, 1, 1);
@@ -285,13 +292,26 @@ public class Cli {
     println("      --tracing.agent string   Tracing agent address");
   }
 
-  private static void printUsagePingResponder() {
-    println("Usage: jpan-cli ping-responder");
-    println();
+  static void printUsagePingResponder() {
     println("  This command starts a server that responds to incoming echo requests.");
     println("  It takes a configuration file `ping-responder-config.json` as input.");
     println("  See README.md for more information.");
     println("");
+
+    println("Usage:");
+    println("  jpan-cli ping-responder [flags]");
+    println();
+    println("Aliases:");
+    println("  ping-responder, pr");
+    println("");
+    println("Examples:");
+    println("  jpan-cli ping-responder 1-ff00:0:110");
+    println("  jpan-cli ping-responder 1-ff00:0:110 --port 12345");
+    // println("  jpan-cli ping-responder 1-ff00:0:110 --local 127.0.0.55");
+    println("");
+    println("Flags:");
+    // println("  -l, --local ip               Local IP address to listen on. (default invalid IP)");
+    println("      --port <port>            Use specified local port (default 30041).");
   }
 
   private static void printSequenceHelp() {

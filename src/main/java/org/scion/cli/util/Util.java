@@ -14,10 +14,12 @@
 
 package org.scion.cli.util;
 
+import org.scion.jpan.ScionRuntimeException;
 import org.scion.jpan.ScionSocketAddress;
 import org.scion.jpan.ScionUtil;
 import org.scion.jpan.internal.IPHelper;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
@@ -28,6 +30,8 @@ public class Util {
   public static boolean PRINT = true;
   public static boolean DELAYED_PRINT = false; // print only at newlines
   private static final StringBuilder sb = new StringBuilder();
+
+  private Util() {}
 
   public static void sleep(long millis) {
     try {
@@ -48,11 +52,12 @@ public class Util {
     }
   }
 
-  private static void println(String... strs) {
+  private static String toString(String... strs) {
+    StringBuilder sb = new StringBuilder();
     for (String m : strs) {
-      print(m);
+      sb.append(m);
     }
-    Util.println();
+    return sb.toString();
   }
 
   public static void println(String msg) {
@@ -81,7 +86,7 @@ public class Util {
   }
 
   public static class Ref<T> {
-    public T t;
+    private T t;
 
     private Ref(T t) {
       this.t = t;
@@ -104,29 +109,44 @@ public class Util {
     }
   }
 
+  public interface Runner {
+    void run() throws IOException;
+  }
+
+  public static void handleExit(Runner runner) {
+    try {
+      runner.run();
+    } catch (ExitCodeException e) {
+      println(e.getMessage());
+      System.exit(e.exitCode());
+    } catch (IOException e) {
+      throw new ScionRuntimeException(e);
+    }
+  }
+
   public static void exit2(String... strs) {
-    println(strs);
-    System.exit(2);
+    String msg = toString(strs);
+    println(msg);
+    throw new ExitCodeException(2, msg);
   }
 
   public static <T> T tryParse(String argName, String argValue, Callable<T> fn) {
     try {
       return fn.call();
     } catch (Exception e) {
-      exit2("Error: Invalid --" + argName + " value: ", argValue, " -> ", e.getMessage());
+      throw new ExitCodeException(2, "Error: Invalid --" + argName + " value: " + argValue + " -> " + e.getMessage());
     }
-    throw new IllegalStateException(); // Should never happen
   }
 
   public static Integer parseInt(String argName, List<String> args) {
     if (args.size() < 2) {
       exit2("Error: --" + argName + " requires a number");
     }
-    int v = 0;
+    int v;
     try {
       v = Integer.parseInt(args.get(1));
     } catch (NumberFormatException e) {
-      exit2("Error: Invalid --\" + argName + \" value: ", args.get(1));
+      throw new ExitCodeException(2, "Error: Invalid --\" + argName + \" value: " + args.get(1));
     }
     args.remove(1);
     return v;
@@ -134,9 +154,20 @@ public class Util {
 
   public static String parseString(String argName, List<String> args) {
     if (args.size() < 2) {
-      exit2("Error: --" + argName + " requires a string argument");
+      throw new ExitCodeException(2, "Error: --" + argName + " requires a string argument");
     }
     return args.remove(1);
+  }
+
+  public static InetAddress parseIP(String argName, List<String> args) {
+    if (args.size() < 2) {
+      throw new ExitCodeException(2, "Error: --" + argName + " requires a string argument");
+    }
+    try {
+      return IPHelper.toInetAddress(args.remove(1));
+    } catch (UnknownHostException e) {
+      throw new ExitCodeException(2, "Error: --" + argName + " requires an IP address argument");
+    }
   }
 
   public static ScionSocketAddress parseScionAddress(List<String> args) {
@@ -161,7 +192,7 @@ public class Util {
       InetAddress inetAddr = InetAddress.getByAddress(addrStr, addrBytes);
       return ScionSocketAddress.from(null, isdIa, inetAddr, 30041);
     } catch (IndexOutOfBoundsException | IllegalArgumentException | UnknownHostException e) {
-      println("ERROR parsing address {}: error=\"{}\"", s, e.getMessage());
+      println("ERROR parsing address " + s + ": error=\"" + e.getMessage() + "\"");
     }
 
     if (args.size() != 1) {

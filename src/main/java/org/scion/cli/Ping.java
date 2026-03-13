@@ -21,9 +21,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.scion.cli.util.ExitCodeException;
 import org.scion.cli.util.Util;
 import org.scion.jpan.*;
-import org.scion.jpan.internal.IPHelper;
 
 import static org.scion.cli.util.Util.*;
 
@@ -56,6 +56,10 @@ public class Ping {
   private static String dstUrl;
 
   public static void main(String... args) throws IOException {
+    handleExit(() -> run(args));
+  }
+
+  public static void run(String... args) throws IOException {
     parseArgs(args);
     System.setProperty(Constants.PROPERTY_SHIM, startShim ? "true" : "false"); // disable SHIM
     try {
@@ -66,11 +70,10 @@ public class Ping {
       } else if (dstAddress != null) {
         n = run(service.getPaths(dstAddress.getIsdAs(), dstAddress.getAddress(), dstAddress.getPort()));
       } else {
-        exit2("Error: missing address or --url");
-        throw new IllegalArgumentException();
+        throw new ExitCodeException(2, "Error: missing address or --url");
       }
       if (n == 0) {
-        System.exit(1);
+        throw new ExitCodeException(1);
       }
     } finally {
       Scion.closeDefault();
@@ -99,9 +102,7 @@ public class Ping {
               tryParse("isd-as", args.get(1), () -> ScionUtil.parseIA(parseString("isd-as", args)));
           break;
         case "--local":
-          localIP =
-              tryParse(
-                  "local", args.get(1), () -> IPHelper.toInetAddress(parseString("local", args)));
+          localIP = parseIP("local", args);
           break;
         case "-s":
         case "--payload-size":
@@ -109,8 +110,7 @@ public class Ping {
           break;
         case "--help":
           Cli.printUsagePing();
-          System.exit(0);
-          break;
+          throw new ExitCodeException(0);
         case "--shim":
           startShim = true;
           break;
