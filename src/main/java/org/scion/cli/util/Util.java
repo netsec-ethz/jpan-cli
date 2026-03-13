@@ -14,13 +14,13 @@
 
 package org.scion.cli.util;
 
-import org.scion.jpan.ScionRuntimeException;
-import org.scion.jpan.ScionSocketAddress;
 import org.scion.jpan.ScionUtil;
 import org.scion.jpan.internal.IPHelper;
+import org.scion.jpan.internal.ScionAddress;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -119,15 +119,10 @@ public class Util {
     } catch (ExitCodeException e) {
       println(e.getMessage());
       System.exit(e.exitCode());
-    } catch (IOException e) {
-      throw new ScionRuntimeException(e);
+    } catch (Exception e) {
+      e.printStackTrace();
+      System.exit(2);
     }
-  }
-
-  public static void exit2(String... strs) {
-    String msg = toString(strs);
-    println(msg);
-    throw new ExitCodeException(2, msg);
   }
 
   public static <T> T tryParse(String argName, String argValue, Callable<T> fn) {
@@ -140,7 +135,7 @@ public class Util {
 
   public static Integer parseInt(String argName, List<String> args) {
     if (args.size() < 2) {
-      exit2("Error: --" + argName + " requires a number");
+      throw new ExitCodeException(2, "Error: --" + argName + " requires a number");
     }
     int v;
     try {
@@ -161,7 +156,7 @@ public class Util {
 
   public static InetAddress parseIP(String argName, List<String> args) {
     if (args.size() < 2) {
-      throw new ExitCodeException(2, "Error: --" + argName + " requires a string argument");
+      throw new ExitCodeException(2, "Error: --" + argName + " requires an IP address argument");
     }
     try {
       return IPHelper.toInetAddress(args.remove(1));
@@ -170,7 +165,18 @@ public class Util {
     }
   }
 
-  public static ScionSocketAddress parseScionAddress(List<String> args) {
+  public static InetSocketAddress parseAddress(String argName, List<String> args) {
+    if (args.size() < 2) {
+      throw new ExitCodeException(2, "Error: --" + argName + " requires an IP:port argument");
+    }
+    try {
+      return IPHelper.toInetSocketAddress(args.remove(1));
+    } catch (RuntimeException e) {
+      throw new ExitCodeException(2, "Error: --" + argName + " requires an IP:port argument");
+    }
+  }
+
+  public static ScionAddress parseScionAddress(List<String> args) {
     String s = args.get(1);
     try {
       String[] addrParts = s.split(",");
@@ -190,15 +196,10 @@ public class Util {
       byte[] addrBytes = IPHelper.toByteArray(addrStr);
       check(addrBytes != null, "Address string is not a legal address");
       InetAddress inetAddr = InetAddress.getByAddress(addrStr, addrBytes);
-      return ScionSocketAddress.from(null, isdIa, inetAddr, 30041);
+      return ScionAddress.create(isdIa, inetAddr);
     } catch (IndexOutOfBoundsException | IllegalArgumentException | UnknownHostException e) {
       println("ERROR parsing address " + s + ": error=\"" + e.getMessage() + "\"");
     }
-
-    if (args.size() != 1) {
-      exit2("Error: could not parse destination address: " + args.get(1));
-    }
-    args.remove(1);
     return null;
   }
 

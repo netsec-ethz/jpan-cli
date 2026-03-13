@@ -16,42 +16,41 @@ package org.scion.cli;
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import org.scion.cli.util.ExitCodeException;
 import org.scion.jpan.*;
+import org.scion.jpan.internal.ScionAddress;
 
 import static org.scion.cli.util.Util.*;
 
 /**
  * This demo mimics the "scion traceroute" command available in scionproto (<a
- * href="https://github.com/scionproto/scion">...</a>). This demo also demonstrates different ways
- * of connecting to a network: <br>
- * - JUNIT_MOCK shows how to use the mock network in this library (for JUnit tests) <br>
- * - SCION_PROTO shows how to connect to a local topology from the scionproto go implementation such
- * as "tiny". Note that the constants for "minimal" differ somewhat from the scionproto topology.
- * <br>
- * - PRODUCTION shows different ways how to connect to the production network. Note: While the
- * production network uses the dispatcher, the demo needs to use port 30041.
- *
- * <p>Commented out lines show alternative ways to connect or alternative destinations.
+ * href="https://github.com/scionproto/scion">...</a>).
  */
 public class Traceroute {
 
-  public static boolean PRINT = true;
-  public static Network NETWORK = Network.PRODUCTION;
+  private static Integer localPort;
+  private static boolean startShim = false;
+  private static long localIsdAs = 0;
+  private static InetAddress localIP = null;
+  private static ScionAddress dstAddress;
+  private static String dstUrl;
+  private static InetSocketAddress daemon;
+  private static int timeoutMs = 1000;
 
-  public enum Network {
-    JUNIT_MOCK_V4, // SCION Java JUnit mock network with local AS = 1-ff00:0:112
-    JUNIT_MOCK_V6, // SCION Java JUnit mock network with local AS = 1-ff00:0:112
-    SCION_PROTO, // Try to connect to scionproto networks, e.g. "tiny"
-    PRODUCTION // production network
+  public static void main(String... args) {
+    handleExit(() -> run(args));
   }
 
-  public static void init(boolean print, Network network) {
-    PRINT = print;
-    NETWORK = network;
-  }
-
-  public static void main(String... args) throws IOException {
+  public static void run(String... args) throws IOException {
+    parseArgs(args);
+    System.setProperty(Constants.PROPERTY_SHIM, startShim ? "true" : "false"); // disable SHIM
+    if (daemon != null) {
+      System.setProperty(Constants.PROPERTY_DAEMON, daemon.toString());
+    }
     try {
       run();
     } finally {
@@ -59,19 +58,68 @@ public class Traceroute {
     }
   }
 
-  public static int run() throws IOException {
-    return runDemo(ScionUtil.parseIA("65-2:0:6c"));
+  private static void parseArgs(String[] argsArray) {
+    List<String> args = new ArrayList<>(Arrays.asList(argsArray));
+    while (!args.isEmpty()) {
+      switch (args.get(0)) {
+        case "-h":
+        case "--help":
+          Cli.printUsagePing();
+          throw new ExitCodeException(0);
+        case "--isd-as":
+          localIsdAs =
+                  tryParse("isd-as", args.get(1), () -> ScionUtil.parseIA(parseString("isd-as", args)));
+          break;
+        case "-l":
+        case "--local":
+          localIP = parseIP("local", args);
+          break;
+        case "--port":
+          localPort = parseInt("port", args);
+          break;
+        case "--shim":
+          startShim = true;
+          break;
+        case "--sciond":
+          daemon = parseAddress("sciond", args);
+          break;
+        case "--timeout":
+          timeoutMs = parseInt("timeout", args);
+          break;
+        case "--url":
+          dstUrl = parseString("url", args);
+          break;
+        default:
+          if (dstAddress == null) {
+            dstAddress = parseScionAddress(args);
+            if (dstAddress != null) {
+              continue;
+            }
+          }
+          throw new ExitCodeException(2, "Unknown option: " + args.get(0));
+      }
+      args.remove(0);
+    }
+    if (dstAddress == null) {
+      throw new ExitCodeException(2, "Please provide a destination address.");
+    }
   }
 
-  private static int runDemo(long destinationIA) throws IOException {
+  public static void run() throws IOException {
     ScionService service = Scion.defaultService();
-    // Dummy address. The traceroute will contact the control service IP instead.
-    InetSocketAddress destinationAddress =
-        new InetSocketAddress(Inet4Address.getByAddress(new byte[] {1, 2, 3, 4}), 12345);
-    List<Path> paths = service.getPaths(destinationIA, destinationAddress);
+
+    List<Path> paths;
+    if (dstUrl != null) {
+      paths = service.lookupPaths(dstUrl, Constants.SCMP_PORT);
+    } else if (dstAddress != null) {
+      paths = service.getPaths(dstAddress.getIsdAs(), dstAddress.getInetAddress(), Constants.SCMP_PORT);
+    } else {
+      throw new ExitCodeException(2, "Error: missing address or --url");
+    }
+
     if (paths.isEmpty()) {
       String src = ScionUtil.toStringIA(service.getLocalIsdAs());
-      String dst = ScionUtil.toStringIA(destinationIA);
+      String dst = ScionUtil.toStringIA(dstAddress.getIsdAs());
       throw new IOException("No path found from " + src + " to " + dst);
     }
     Path path = paths.get(0);
@@ -83,7 +131,12 @@ public class Traceroute {
       localAddress = channel.getLocalAddress().getAddress().getHostAddress();
     }
 
-    try (ScmpSender sender = Scmp.newSenderBuilder().build()) {
+    ScmpSender.Builder builder = ScmpSender.newBuilder();
+    if (localPort != null) {
+      builder.setLocalPort(localPort);
+    }
+    try (ScmpSender sender = builder.build()) {
+      sender.setTimeOut(timeoutMs);
       println("Listening on port " + sender.getLocalAddress().getPort() + " ...");
       println("Resolved local address: ");
       println("  " + localAddress);
@@ -103,7 +156,9 @@ public class Traceroute {
         out += " " + millis + "ms";
         println(out);
       }
-      return n;
+      if (n > 0) {
+        throw new ExitCodeException(1, "Number of timeouts: " + n);
+      }
     }
   }
 

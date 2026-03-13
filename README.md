@@ -50,6 +50,12 @@ java -jar jpan-cli.jar help
 
 # Troubleshooting
 
+## No answers received
+
+In some ASes, border routers will send return packets to port 30041. To receive these packets,
+please start the tool with `--port 30041`. This is applicable to `ping` and `traceroute`.
+
+
 ## No DNS search domain found. Please check your /etc/resolv.conf or similar.
 
 This happens, for example, on Windows when using a VPN. One solution is to execute the jar with the

@@ -24,51 +24,45 @@ import java.util.List;
 import org.scion.cli.util.ExitCodeException;
 import org.scion.cli.util.Util;
 import org.scion.jpan.*;
+import org.scion.jpan.internal.ScionAddress;
 
 import static org.scion.cli.util.Util.*;
 
 /**
  * This demo mimics the "scion ping" command available in scionproto (<a
- * href="https://github.com/scionproto/scion">...</a>). This demo also demonstrates different ways
- * of connecting to a network: <br>
- * - JUNIT_MOCK shows how to use the mock network in this library (for JUnit tests) <br>
- * - SCION_PROTO shows how to connect to a local topology from the scionproto go implementation such
- * as "tiny". Note that the constants for "minimal" differ somewhat from the scionproto topology.
- * <br>
- * - PRODUCTION shows different ways how to connect to the production network. Note: While the
- * production network uses the dispatcher, the demo needs to use port 30041.
- *
- * <p>Commented out lines show alternative ways to connect or alternative destinations.
+ * href="https://github.com/scionproto/scion">...</a>).
  */
 public class Ping {
 
-  static int localPort = Constants.SCMP_PORT;
+  private static Integer localPort = -1;
   private static int count = 10;
   private static int intervalMs = 1000;
   private static boolean startShim = false;
   private static long localIsdAs = 0;
   private static InetAddress localIP = null;
   private static int payloadSize = 0;
-  private static InetAddress dstIA;
-  private static InetAddress dstIP;
-  private static InetAddress dstPort;
-  private static ScionSocketAddress dstAddress;
+  private static ScionAddress dstAddress;
   private static String dstUrl;
+  private static InetSocketAddress daemon;
+  private static int timeoutMs = 1000;
 
-  public static void main(String... args) throws IOException {
+  public static void main(String... args) {
     handleExit(() -> run(args));
   }
 
   public static void run(String... args) throws IOException {
     parseArgs(args);
     System.setProperty(Constants.PROPERTY_SHIM, startShim ? "true" : "false"); // disable SHIM
+    if (daemon != null) {
+      System.setProperty(Constants.PROPERTY_DAEMON, daemon.toString());
+    }
     try {
       ScionService service = Scion.defaultService();
       int n;
       if (dstUrl != null) {
         n = run(service.lookupPaths(dstUrl, Constants.SCMP_PORT));
       } else if (dstAddress != null) {
-        n = run(service.getPaths(dstAddress.getIsdAs(), dstAddress.getAddress(), dstAddress.getPort()));
+        n = run(service.getPaths(dstAddress.getIsdAs(), dstAddress.getInetAddress(), Constants.SCMP_PORT));
       } else {
         throw new ExitCodeException(2, "Error: missing address or --url");
       }
@@ -83,17 +77,15 @@ public class Ping {
   private static void parseArgs(String[] argsArray) {
     List<String> args = new ArrayList<>(Arrays.asList(argsArray));
     while (!args.isEmpty()) {
-      if (args.size() == 1) {
-        dstAddress = parseScionAddress(args);
-        if (dstAddress != null) {
-          continue;
-        }
-      }
       switch (args.get(0)) {
         case "-c":
         case "--count":
           count = parseInt("count", args);
           break;
+        case "-h":
+        case "--help":
+          Cli.printUsagePing();
+          throw new ExitCodeException(0);
         case "--interval":
           intervalMs = parseInt("interval", args);
           break;
@@ -101,37 +93,51 @@ public class Ping {
           localIsdAs =
               tryParse("isd-as", args.get(1), () -> ScionUtil.parseIA(parseString("isd-as", args)));
           break;
+        case "-l":
         case "--local":
           localIP = parseIP("local", args);
+          break;
+        case "--port":
+          localPort = parseInt("port", args);
           break;
         case "-s":
         case "--payload-size":
           payloadSize = parseInt("payload-size", args);
           break;
-        case "--help":
-          Cli.printUsagePing();
-          throw new ExitCodeException(0);
         case "--shim":
           startShim = true;
+          break;
+        case "--sciond":
+          daemon = parseAddress("sciond", args);
+          break;
+        case "--timeout":
+          timeoutMs = parseInt("timeout", args);
           break;
         case "--url":
           dstUrl = parseString("url", args);
           break;
-        case "--port":
-          localPort = parseInt("port", args);
-          break;
         default:
-          Util.println("Unknown option: " + args.get(0));
-          Cli.printUsagePing();
-          System.exit(1);
+          if (dstAddress == null) {
+            dstAddress = parseScionAddress(args);
+            if (dstAddress != null) {
+              continue;
+            }
+          }
+          throw new ExitCodeException(2, "Unknown option: " + args.get(0));
       }
       args.remove(0);
+    }
+    if (dstAddress == null) {
+      throw new ExitCodeException(2, "Please provide a destination address.");
     }
   }
 
   private static int run(List<Path> paths) throws IOException {
     Path path = paths.get(0);
-    ByteBuffer data = ByteBuffer.allocate(0);
+    ByteBuffer data = ByteBuffer.allocate(payloadSize);
+    for (int i = 0; i < payloadSize; i++) {
+      data.put((byte)i);
+    }
 
     String localAddress;
     try (ScionDatagramChannel channel = ScionDatagramChannel.open()) {
@@ -141,7 +147,12 @@ public class Ping {
     }
 
     int n = 0;
-    try (ScmpSender sender = Scmp.newSenderBuilder().build()) {
+    ScmpSender.Builder builder = ScmpSender.newBuilder();
+    if (localPort != null) {
+      builder.setLocalPort(localPort);
+    }
+    try (ScmpSender sender = builder.build()) {
+      sender.setTimeOut(timeoutMs);
       println("Listening on port " + sender.getLocalAddress().getPort() + " ...");
       println("Resolved local address: ");
       println("  " + localAddress);

@@ -33,7 +33,7 @@ public class PingResponder {
   private static int localPort = 30041;
   private static InetAddress localIP = null;
 
-  public static void main(String[] args) throws IOException {
+  public static void main(String[] args) {
     handleExit(() -> run(args));
   }
 
@@ -52,12 +52,14 @@ public class PingResponder {
     List<String> args = new ArrayList<>(Arrays.asList(argsArray));
     while (!args.isEmpty()) {
       switch (args.get(0)) {
-        case "--local":
-          localIP = parseIP("local", args);
-          break;
+        case "h":
         case "--help":
           Cli.printUsagePingResponder();
           throw new ExitCodeException(0);
+        case "l":
+        case "--local":
+          localIP = parseIP("local", args);
+          break;
         case "--port":
           localPort = parseInt("port", args);
           break;

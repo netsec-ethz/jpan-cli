@@ -17,8 +17,6 @@
 
 package org.scion.cli;
 
-import org.scion.cli.util.ExitCodeException;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Locale;
@@ -29,7 +27,7 @@ public class Cli {
 
   private static final String VERSION = "0.1.0 (using JPAN 0.6.2-SNAPSHOT)";
 
-  public static void main(String[] args) throws IOException {
+  public static void main(String[] args) {
     handleExit(() -> run(args));
   }
 
@@ -199,17 +197,14 @@ public class Cli {
     //    println("      --packet-size uint       number of bytes to be sent including the SCION Header and SCMP echo header,");
     //    println("                               the desired size must provide enough space for the required headers. This flag");
     //    println("                               overrides the 'payload_size' flag.");
+    println("      --port <port             Use specified local port");
     println("  -s, --payload-size uint      number of bytes to be sent in addition to the SCION Header and SCMP echo header;");
     println("                               the total size of the packet is still variable size due to the variable size of");
     //    println("      --refresh                set refresh flag for path request");
     println("      --sciond string          SCION Daemon address. (default \"127.0.0.1:30255\")");
     //    println("      --sequence string        Space separated list of hop predicates");
+    println("      --shim                   Start with SHIM enabled (default disabled).");
     println("      --timeout duration       timeout per packet (default 1s)");
-    //    println("      --tracing.agent string   Tracing agent address");
-
-    println("  --port <port>       Use specified local port (default " + Ping.localPort + ").");
-    println("  --shim              Start with SHIM enabled (default disabled).");
-
   }
 
   private static void printUsageTraceroute() {
@@ -230,19 +225,20 @@ public class Cli {
     println("  jpan-cli traceroute 1-ff00:0:110,10.0.0.1");
     println("");
     println("Flags:");
-    println("      --epic                   Enable EPIC.");
-    println("      --format string          Specify the output format (human|json|yaml) (default \"human\")");
+//    println("      --epic                   Enable EPIC.");
+//    println("      --format string          Specify the output format (human|json|yaml) (default \"human\")");
     println("  -h, --help                   help for traceroute");
-    println("  -i, --interactive            interactive mode");
-    println("      --isd-as isd-as          The local ISD-AS to use. (default 0-0)");
-    println("  -l, --local ip               Local IP address to listen on. (default invalid IP)");
-    println("      --log.level string       Console logging level verbosity (debug|info|error)");
-    println("      --no-color               disable colored output");
-    println("      --refresh                set refresh flag for path request");
+//    println("  -i, --interactive            interactive mode");
+//    println("      --isd-as isd-as          The local ISD-AS to use. (default 0-0)");
+//    println("  -l, --local ip               Local IP address to listen on. (default invalid IP)");
+//    println("      --log.level string       Console logging level verbosity (debug|info|error)");
+//    println("      --no-color               disable colored output");
+    println("      --port <port>            Use specified local port");
+//    println("      --refresh                set refresh flag for path request");
     println("      --sciond string          SCION Daemon address. (default \"127.0.0.1:30255\")");
-    println("      --sequence string        Space separated list of hop predicates");
+//    println("      --sequence string        Space separated list of hop predicates");
+    println("      --shim                   Start with SHIM enabled (default disabled).");
     println("      --timeout duration       timeout per packet (default 1s)");
-    println("      --tracing.agent string   Tracing agent address");
   }
 
   private static void printUsageShowpaths() {
