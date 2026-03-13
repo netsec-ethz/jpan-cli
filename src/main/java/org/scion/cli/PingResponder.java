@@ -23,7 +23,6 @@ import java.util.List;
 import org.scion.cli.util.ExitCodeException;
 import org.scion.jpan.*;
 import org.scion.cli.util.Util;
-import org.scion.jpan.internal.IPHelper;
 
 import static org.scion.cli.util.Util.*;
 

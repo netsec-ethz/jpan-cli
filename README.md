@@ -34,6 +34,11 @@ For example, to get command line help, the tool can be executed with:
 java -jar jpan-cli.jar help
 ```
 
+## Known Issues
+
+In JPAN 0.6.1, the SCMP Responder will always return packets to 30041, regardless of their 
+actual source port, see JPAN issue [#233](https://github.com/scionproto-contrib/jpan/issues/233). 
+
 # Troubleshooting
 
 ## No ping/traceroute answers received
