@@ -64,7 +64,7 @@ public class Traceroute {
       switch (args.get(0)) {
         case "-h":
         case "--help":
-          Cli.printUsagePing();
+          Cli.printUsageTraceroute();
           throw new ExitCodeException(0);
         case "--isd-as":
           localIsdAs =

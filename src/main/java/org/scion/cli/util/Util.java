@@ -52,14 +52,6 @@ public class Util {
     }
   }
 
-  private static String toString(String... strs) {
-    StringBuilder sb = new StringBuilder();
-    for (String m : strs) {
-      sb.append(m);
-    }
-    return sb.toString();
-  }
-
   public static void println(String msg) {
     print(msg);
     println();
@@ -176,8 +168,17 @@ public class Util {
     }
   }
 
+  public static Long parseIsdAs(List<String> args) {
+    String v = args.get(0);
+    try {
+      return ScionUtil.parseIA(args.remove(0));
+    } catch (RuntimeException e) {
+      throw new ExitCodeException(2, "Error: ISD/AS code is invalid: " + v);
+    }
+  }
+
   public static ScionAddress parseScionAddress(List<String> args) {
-    String s = args.get(1);
+    String s = args.get(0);
     try {
       String[] addrParts = s.split(",");
       check(addrParts.length == 2, "Expected `,`");

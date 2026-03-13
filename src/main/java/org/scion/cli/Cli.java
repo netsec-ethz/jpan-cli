@@ -205,9 +205,10 @@ public class Cli {
     //    println("      --sequence string        Space separated list of hop predicates");
     println("      --shim                   Start with SHIM enabled (default disabled).");
     println("      --timeout duration       timeout per packet (default 1s)");
+    println("      --url url                Use and resolve a url as destination address");
   }
 
-  private static void printUsageTraceroute() {
+  static void printUsageTraceroute() {
     println("'traceroute' traces the SCION path to a remote AS using");
     println("SCMP traceroute packets.");
     println("");
@@ -239,9 +240,10 @@ public class Cli {
 //    println("      --sequence string        Space separated list of hop predicates");
     println("      --shim                   Start with SHIM enabled (default disabled).");
     println("      --timeout duration       timeout per packet (default 1s)");
+    println("      --url url                Use and resolve a url as destination address");
   }
 
-  private static void printUsageShowpaths() {
+  static void printUsageShowpaths() {
     println("'showpaths' lists available paths between the local and the specified");
     println("SCION AS.");
     println("");
@@ -257,7 +259,7 @@ public class Cli {
     //    println("");
     println("");
     println("Usage:");
-    println("  jpan-cli showpaths [flags]");
+    println("  jpan-cli showpaths ISD-AS [flags]");
     println("");
     println("Aliases:");
     println("  showpaths, sp");
