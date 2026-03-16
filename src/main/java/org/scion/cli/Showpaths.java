@@ -48,6 +48,7 @@ public class Showpaths {
   private static InetSocketAddress daemon;
   private static Long isdAs;
   private static boolean extended = false;
+  private static int maxPaths = 10;
 
   public static void main(String... args) {
     handleExit(() -> run(args));
@@ -69,6 +70,10 @@ public class Showpaths {
     List<String> args = new ArrayList<>(Arrays.asList(argsArray));
     while (!args.isEmpty()) {
       switch (args.get(0)) {
+        case "-e":
+        case "--extended":
+          extended = true;
+          break;
         case "-h":
         case "--help":
           Cli.printUsageShowpaths();
@@ -81,17 +86,20 @@ public class Showpaths {
         case "--local":
           localIP = parseIP("local", args);
           break;
+        case "-m":
+        case "--maxpaths":
+          maxPaths = parseInt("--maxpaths", args);
+          break;
         case "--sciond":
           daemon = parseAddress("sciond", args);
           break;
         default:
           if (isdAs == null) {
             isdAs = parseIsdAs(args);
-            if (isdAs != null) {
-              continue;
-            }
+            continue;
+          } else {
+            throw new ExitCodeException(2, "Unknown option: " + args.get(0));
           }
-          throw new ExitCodeException(2, "Unknown option: " + args.get(0));
       }
       args.remove(0);
     }
@@ -116,6 +124,9 @@ public class Showpaths {
 
     int id = 0;
     for (Path path : paths) {
+      if (id >= maxPaths) {
+        break;
+      }
       String localIP;
       try (ScionDatagramChannel channel = ScionDatagramChannel.open()) {
         channel.connect(path);

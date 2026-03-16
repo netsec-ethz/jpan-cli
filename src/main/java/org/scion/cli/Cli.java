@@ -139,8 +139,8 @@ public class Cli {
     println("");
     println("Flags:");
     println("  -h, --help            help for address");
-    println("      --isd-as isd-as   The local ISD-AS to use. (default 0-0)");
-    println("      --json            Write the output as machine readable json");
+    // println("      --isd-as isd-as   The local ISD-AS to use. (default 0-0)");
+    // println("      --json            Write the output as machine readable json");
     println("  -l, --local ip        Local IP address to listen on. (default invalid IP)");
     println("      --sciond string   SCION Daemon address. (default \"127.0.0.1:30255\")");
   }
@@ -178,9 +178,9 @@ public class Cli {
     println("  -h, --help                   help for ping");
     //    println("  -i, --interactive            interactive mode");
     println("      --interval duration      time between packets (default 1s)");
-    println("      --isd-as isd-as          The local ISD-AS to use. (default 0-0)");
+    // println("      --isd-as isd-as          The local ISD-AS to use. (default 0-0)");
     println("  -l, --local ip               Local IP address to listen on. (default invalid IP)");
-    println("      --log.level string       Console logging level verbosity (debug|info|error)");
+    // println("      --log.level string       Console logging level verbosity (debug|info|error)");
     //    println("      --max-mtu                choose the payload size such that the sent SCION
     // packet including the SCION Header,");
     //    println("                               SCMP echo header and payload are equal to the MTU
@@ -192,7 +192,7 @@ public class Cli {
     //    println("                               the desired size must provide enough space for the
     // required headers. This flag");
     //    println("                               overrides the 'payload_size' flag.");
-    println("      --port <port             Use specified local port");
+    println("      --port uint16            use specified local port");
     println(
         "  -s, --payload-size uint      number of bytes to be sent in addition to the SCION Header and SCMP echo header;");
     println(
@@ -200,9 +200,9 @@ public class Cli {
     //    println("      --refresh                set refresh flag for path request");
     println("      --sciond string          SCION Daemon address. (default \"127.0.0.1:30255\")");
     //    println("      --sequence string        Space separated list of hop predicates");
-    println("      --shim                   Start with SHIM enabled (default disabled).");
+    println("      --shim                   start with SHIM enabled (default disabled).");
     println("      --timeout duration       timeout per packet (default 1s)");
-    println("      --url url                Use and resolve a url as destination address");
+    println("      --url url                use and resolve a url as destination address");
   }
 
   static void printUsageTraceroute() {
@@ -234,13 +234,13 @@ public class Cli {
     //    println("      --log.level string       Console logging level verbosity
     // (debug|info|error)");
     //    println("      --no-color               disable colored output");
-    println("      --port <port>            Use specified local port");
+    println("      --port uint16            use specified local port");
     //    println("      --refresh                set refresh flag for path request");
     println("      --sciond string          SCION Daemon address. (default \"127.0.0.1:30255\")");
     //    println("      --sequence string        Space separated list of hop predicates");
-    println("      --shim                   Start with SHIM enabled (default disabled).");
+    println("      --shim                   start with SHIM enabled (default disabled).");
     println("      --timeout duration       timeout per packet (default 1s)");
-    println("      --url url                Use and resolve a url as destination address");
+    println("      --url url                use and resolve a url as destination address");
   }
 
   static void printUsageShowpaths() {
@@ -275,29 +275,30 @@ public class Cli {
     println("  jpan-cli showpaths 1-ff00:0:110 --no-probe");
     println("");
     println("Flags:");
-    println("      --epic                   Enable EPIC.");
+    //    println("      --epic                   Enable EPIC.");
     println("  -e, --extended               Show extended path meta data information");
-    println(
-        "      --format string          Specify the output format (human|json|yaml) (default \"human\")");
+    //    println(
+    //        "      --format string          Specify the output format (human|json|yaml) (default
+    // \"human\")");
     println("  -h, --help                   help for showpaths");
-    println("      --isd-as isd-as          The local ISD-AS to use. (default 0-0)");
+    //    println("      --isd-as isd-as          The local ISD-AS to use. (default 0-0)");
     println("  -l, --local ip               Local IP address to listen on. (default invalid IP)");
-    println("      --log.level string       Console logging level verbosity (debug|info|error)");
+    //    println("      --log.level string       Console logging level verbosity
+    // (debug|info|error)");
     println(
-        "  -m, --maxpaths int           Maximum number of paths that are displayed (default 10)");
-    println("      --no-color               disable colored output");
-    println("      --no-probe               Do not probe the paths and print the health status");
-    println("  -r, --refresh                Set refresh flag for SCION Daemon path request");
+        "  -m, --maxpaths int           maximum number of paths that are displayed (default 10)");
+    //    println("      --no-color               disable colored output");
+    //    println("      --no-probe               Do not probe the paths and print the health
+    // status");
+    //    println("  -r, --refresh                Set refresh flag for SCION Daemon path request");
     println("      --sciond string          SCION Daemon address. (default \"127.0.0.1:30255\")");
-    println("      --sequence string        Space separated list of hop predicates");
-    println("      --timeout duration       Timeout (default 5s)");
-    println("      --tracing.agent string   Tracing agent address");
+    //    println("      --sequence string        Space separated list of hop predicates");
+    //    println("      --timeout duration       Timeout (default 5s)");
+    //    println("      --tracing.agent string   Tracing agent address");
   }
 
   static void printUsagePingResponder() {
-    println("  This command starts a server that responds to incoming echo requests.");
-    println("  It takes a configuration file `ping-responder-config.json` as input.");
-    println("  See README.md for more information.");
+    println("`ping-responder` starts a server process that responds to incoming echo requests.");
     println("");
 
     println("Usage:");
@@ -314,7 +315,7 @@ public class Cli {
     println("Flags:");
     // println("  -l, --local ip               Local IP address to listen on. (default invalid
     // IP)");
-    println("      --port <port>            Use specified local port.");
+    println("      --port uint16            use specified local port.");
   }
 
   private static void printSequenceHelp() {
