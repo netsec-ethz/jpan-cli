@@ -22,11 +22,10 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import org.scion.cli.util.Errors;
 import org.scion.cli.util.ExitCodeException;
+import org.scion.cli.util.Prober;
 import org.scion.jpan.*;
 
 /**
@@ -50,6 +49,9 @@ public class Showpaths {
   private Long isdAs;
   private boolean extended = false;
   private int maxPaths = 10;
+  private Integer port;
+  private int timeoutMs = 5000;
+  private boolean probePath = true;
 
   public static void main(String... args) {
     handleExit(() -> new Showpaths().run(args));
@@ -102,6 +104,9 @@ public class Showpaths {
         case "--maxpaths":
           maxPaths = parseInt("--maxpaths", args);
           break;
+        case "--no-probe":
+          probePath = false;
+          break;
         case "--sciond":
           daemon = parseAddress("sciond", args);
           break;
@@ -127,6 +132,13 @@ public class Showpaths {
       throw new ExitCodeException(1, "No path found from " + src + " to " + dst);
     }
 
+    Map<Integer, Prober.Status> isActive;
+    if (probePath) {
+      isActive = Prober.probe(port, timeoutMs, paths);
+    } else {
+      isActive = new HashMap<>();
+    }
+
     println("Available paths to " + ScionUtil.toStringIA(isdAs));
 
     int id = 0;
@@ -143,7 +155,7 @@ public class Showpaths {
       String header = "[" + id++ + "] Hops: " + ScionUtil.toStringPath(meta);
       if (extended) {
         println(header);
-        printExtended(path, localIP);
+        printExtended(path, localIP, isActive.getOrDefault(id, Prober.Status.Unknown));
       } else {
         String compact =
             " MTU: "
@@ -154,12 +166,13 @@ public class Showpaths {
                 + path.getFirstHopAddress().getPort()
                 + " LocalIP: "
                 + localIP;
+        // TODO active?
         println(header + compact);
       }
     }
   }
 
-  private static void printExtended(Path path, String localIP) {
+  private static void printExtended(Path path, String localIP, Prober.Status status) {
     StringBuilder sb = new StringBuilder();
     String NL = System.lineSeparator();
 
@@ -173,8 +186,7 @@ public class Showpaths {
     sb.append("    LinkType: ").append(toStringLinkType(meta)).append(NL);
     sb.append("    Notes: ").append(toStringNotes(meta)).append(NL);
     sb.append("    SupportsEPIC: ").append(toStringEPIC(meta)).append(NL);
-    // TODO, see private/app/path/pathprobe/paths.go
-    sb.append("    Status: ").append("unknown").append(NL);
+    sb.append("    Status: ").append(status).append(NL);
     // TODO use destination IP from returned packet from probe
     sb.append("    LocalIP: ").append(localIP).append(NL);
 

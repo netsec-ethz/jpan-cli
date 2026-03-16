@@ -207,7 +207,7 @@ public class Cli {
     println("      --sciond string          SCION Daemon address. (default \"127.0.0.1:30255\")");
     //    println("      --sequence string        Space separated list of hop predicates");
     println("      --shim                   start with SHIM enabled (default disabled).");
-    println("      --timeout duration       timeout per packet (default 1s)");
+    println("      --timeout uint16         timeout per packet in milliseconds (default 1s)");
     println("      --url url                use and resolve a url as destination address");
   }
 
@@ -245,7 +245,7 @@ public class Cli {
     println("      --sciond string          SCION Daemon address. (default \"127.0.0.1:30255\")");
     //    println("      --sequence string        Space separated list of hop predicates");
     println("      --shim                   start with SHIM enabled (default disabled).");
-    println("      --timeout duration       timeout per packet (default 1s)");
+    println("      --timeout uint16         timeout per packet in milliseconds (default 1s)");
     println("      --url url                use and resolve a url as destination address");
   }
 
@@ -299,12 +299,12 @@ public class Cli {
     println(
         "  -m, --maxpaths int           maximum number of paths that are displayed (default 10)");
     //    println("      --no-color               disable colored output");
-    //    println("      --no-probe               Do not probe the paths and print the health
-    // status");
+    println("      --no-probe               Do not probe the paths and print the health status");
+    println("      --port uint16            Use specified local port for probing");
     //    println("  -r, --refresh                Set refresh flag for SCION Daemon path request");
     println("      --sciond string          SCION Daemon address. (default \"127.0.0.1:30255\")");
     //    println("      --sequence string        Space separated list of hop predicates");
-    //    println("      --timeout duration       Timeout (default 5s)");
+    println("      --timeout uint16         Probing timeout in milliseconds (default 5s)");
     //    println("      --tracing.agent string   Tracing agent address");
   }
 
