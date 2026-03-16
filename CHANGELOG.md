@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Support for --log.level
   [#4](https://github.com/netsec-ethz/scion-java-multiping/pull/4)
+- Added path probing for showpaths and --no-probe
+  [#5](https://github.com/netsec-ethz/scion-java-multiping/pull/5)
 
 ### Fixed
 
