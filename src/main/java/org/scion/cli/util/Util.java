@@ -14,6 +14,8 @@
 
 package org.scion.cli.util;
 
+import static org.scion.cli.util.Errors.*;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -113,7 +115,6 @@ public class Util {
       }
       System.exit(e.exitCode());
     } catch (Exception e) {
-      e.printStackTrace();
       System.exit(2);
     }
   }
@@ -199,16 +200,32 @@ public class Util {
       byte[] addrBytes = IPHelper.toByteArray(addrStr);
       check(addrBytes != null, "Address string is not a legal address");
       InetAddress inetAddr = InetAddress.getByAddress(addrStr, addrBytes);
-      return ScionAddress.create(isdIa, inetAddr);
+      ScionAddress scionAddress = ScionAddress.create(isdIa, inetAddr);
+      args.remove(0);
+      return scionAddress;
     } catch (IndexOutOfBoundsException | IllegalArgumentException | UnknownHostException e) {
-      println("ERROR parsing address " + s + ": error=\"" + e.getMessage() + "\"");
+      throw new ExitCodeException(2, PARSING_ADDRESS + s + ": error=\"" + e.getMessage() + "\"");
     }
-    return null;
   }
 
   private static void check(boolean pass, String msg) {
     if (!pass) {
       throw new IllegalArgumentException(msg);
+    }
+  }
+
+  public static void parseAndSetLogLevel(List<String> args) {
+    String ll = parseString("--log.level", args).toUpperCase();
+    switch (ll) {
+      case "ERROR":
+      case "INFO":
+      case "WARN":
+      case "DEBUG":
+        System.out.println("------------ log level: " + ll);
+        System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, ll);
+        break;
+      default:
+        throw new ExitCodeException(2, "Illegal log level: \"" + ll + "\"");
     }
   }
 }

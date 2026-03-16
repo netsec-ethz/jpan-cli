@@ -21,6 +21,7 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.scion.cli.util.Errors;
 import org.scion.cli.util.ExitCodeException;
 import org.scion.jpan.*;
 import org.scion.jpan.internal.ScionAddress;
@@ -31,20 +32,20 @@ import org.scion.jpan.internal.ScionAddress;
  */
 public class Traceroute {
 
-  private static Integer localPort;
-  private static boolean startShim = false;
-  private static long localIsdAs = 0;
-  private static InetAddress localIP = null;
-  private static ScionAddress dstAddress;
-  private static String dstUrl;
-  private static InetSocketAddress daemon;
-  private static int timeoutMs = 1000;
+  private Integer localPort;
+  private boolean startShim = false;
+  private long localIsdAs = 0;
+  private InetAddress localIP = null;
+  private ScionAddress dstAddress;
+  private String dstUrl;
+  private InetSocketAddress daemon;
+  private int timeoutMs = 1000;
 
   public static void main(String... args) {
-    handleExit(() -> run(args));
+    handleExit(() -> new Traceroute().run(args));
   }
 
-  public static void run(String... args) throws IOException {
+  public void run(String... args) throws IOException {
     parseArgs(args);
     System.setProperty(Constants.PROPERTY_SHIM, startShim ? "true" : "false"); // disable SHIM
     if (daemon != null) {
@@ -57,9 +58,17 @@ public class Traceroute {
     }
   }
 
-  private static void parseArgs(String[] argsArray) {
+  private void parseArgs(String[] argsArray) {
     List<String> args = new ArrayList<>(Arrays.asList(argsArray));
     while (!args.isEmpty()) {
+      if (!args.get(0).startsWith("-")) {
+        if (dstAddress == null) {
+          dstAddress = parseScionAddress(args);
+          continue;
+        }
+        throw new ExitCodeException(2, Errors.UNEXPECTED_NON_FLAG + args.get(0));
+      }
+
       switch (args.get(0)) {
         case "-h":
         case "--help":
@@ -72,6 +81,9 @@ public class Traceroute {
         case "-l":
         case "--local":
           localIP = parseIP("local", args);
+          break;
+        case "--log.level":
+          parseAndSetLogLevel(args);
           break;
         case "--port":
           localPort = parseInt("port", args);
@@ -89,20 +101,13 @@ public class Traceroute {
           dstUrl = parseString("url", args);
           break;
         default:
-          if (dstAddress == null) {
-            dstAddress = parseScionAddress(args);
-            if (dstAddress != null) {
-              args.remove(0);
-              continue;
-            }
-          }
-          throw new ExitCodeException(2, "Unknown option: " + args.get(0));
+          throw new ExitCodeException(2, Errors.UNKNOWN_OPTION + args.get(0));
       }
       args.remove(0);
     }
   }
 
-  public static void run() throws IOException {
+  public void run() throws IOException {
     ScionService service = Scion.defaultService();
 
     List<Path> paths;

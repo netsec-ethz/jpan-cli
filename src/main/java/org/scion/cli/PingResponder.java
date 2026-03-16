@@ -21,6 +21,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.scion.cli.util.Errors;
 import org.scion.cli.util.ExitCodeException;
 import org.scion.cli.util.Util;
 import org.scion.jpan.*;
@@ -28,14 +29,14 @@ import org.scion.jpan.*;
 /** A simple echo responder that responds to SCMP echo requests. */
 public class PingResponder {
 
-  private static int localPort = 30041;
-  private static InetAddress localIP = null;
+  private int localPort = 30041;
+  private InetAddress localIP = null;
 
   public static void main(String[] args) {
-    handleExit(() -> run(args));
+    handleExit(() -> new PingResponder().run(args));
   }
 
-  public static void run(String[] args) throws IOException {
+  public void run(String[] args) throws IOException {
     parseArgs(args);
     if (localPort == 30041) {
       System.setProperty(Constants.PROPERTY_SHIM, "false"); // disable SHIM
@@ -51,25 +52,26 @@ public class PingResponder {
     }
   }
 
-  private static void parseArgs(String[] argsArray) {
+  private void parseArgs(String[] argsArray) {
     List<String> args = new ArrayList<>(Arrays.asList(argsArray));
     while (!args.isEmpty()) {
       switch (args.get(0)) {
-        case "h":
+        case "-h":
         case "--help":
           Cli.printUsagePingResponder();
           throw new ExitCodeException(0);
-        case "l":
+        case "-l":
         case "--local":
           localIP = parseIP("local", args);
+          break;
+        case "--log.level":
+          parseAndSetLogLevel(args);
           break;
         case "--port":
           localPort = parseInt("port", args);
           break;
         default:
-          Util.println("Unknown option: " + args.get(0));
-          Cli.printUsagePing();
-          System.exit(1);
+          throw new ExitCodeException(2, Errors.UNKNOWN_OPTION + args.get(0));
       }
       args.remove(0);
     }

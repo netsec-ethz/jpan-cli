@@ -19,44 +19,47 @@ package org.scion.cli;
 
 import static org.scion.cli.util.Util.*;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Locale;
+import org.scion.cli.util.ExitCodeException;
 
 public class Cli {
 
   private static final String VERSION = "0.1.0 (using JPAN 0.6.1)";
 
-  public static void main(String[] args) {
+  public static void main(String... args) {
+    System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "ERROR");
     handleExit(() -> run(args));
     // handleExit(() -> run(new String[] {"traceroute", "66-2:0:18,10.0.0.1"}));
   }
 
-  public static void run(String[] args) {
+  public static void run(String... args) throws IOException {
     checkArgs(args, 1, Integer.MAX_VALUE);
     String mode = args[0].toLowerCase(Locale.ROOT);
     String[] newArgs = Arrays.copyOfRange(args, 1, args.length);
     switch (mode) {
       case "address":
-        Address.main(newArgs);
+        new Address().run(newArgs);
         return;
       case "h":
       case "help":
         printHelp(args.length == 1 ? "" : args[1]);
         return;
       case "ping":
-        Ping.main(newArgs);
+        new Ping().run(newArgs);
         return;
       case "pr":
       case "ping-responder":
-        PingResponder.main(newArgs);
+        new PingResponder().run(newArgs);
         return;
       case "sp":
       case "showpaths":
-        Showpaths.main(newArgs);
+        new Showpaths().run(newArgs);
         return;
       case "tr":
       case "traceroute":
-        Traceroute.main(newArgs);
+        new Traceroute().run(newArgs);
         return;
       case "v":
       case "version":
@@ -64,7 +67,7 @@ public class Cli {
         return;
       default:
         printUsage();
-        System.exit(1);
+        throw new ExitCodeException(2, "Unknown command: \"" + mode + "\"");
     }
   }
 
@@ -72,7 +75,7 @@ public class Cli {
     if (args.length < minArgs || args.length > maxArgs) {
       println("Invalid number of arguments.");
       printUsage();
-      System.exit(1);
+      throw new ExitCodeException(2, "Invalid number of arguments.");
     }
   }
 
@@ -138,11 +141,13 @@ public class Cli {
     println("  jpan-cli address");
     println("");
     println("Flags:");
-    println("  -h, --help            help for address");
+    println("  -h, --help                   help for address");
     // println("      --isd-as isd-as   The local ISD-AS to use. (default 0-0)");
     // println("      --json            Write the output as machine readable json");
-    println("  -l, --local ip        Local IP address to listen on. (default invalid IP)");
-    println("      --sciond string   SCION Daemon address. (default \"127.0.0.1:30255\")");
+    println("  -l, --local ip               Local IP address to listen on. (default invalid IP)");
+    println(
+        "      --log.level string       Console logging level verbosity (debug|info|warn|error)");
+    println("      --sciond string          SCION Daemon address. (default \"127.0.0.1:30255\")");
   }
 
   static void printUsagePing() {
@@ -180,7 +185,8 @@ public class Cli {
     println("      --interval duration      time between packets (default 1s)");
     // println("      --isd-as isd-as          The local ISD-AS to use. (default 0-0)");
     println("  -l, --local ip               Local IP address to listen on. (default invalid IP)");
-    // println("      --log.level string       Console logging level verbosity (debug|info|error)");
+    println(
+        "      --log.level string       Console logging level verbosity (debug|info|warn|error)");
     //    println("      --max-mtu                choose the payload size such that the sent SCION
     // packet including the SCION Header,");
     //    println("                               SCMP echo header and payload are equal to the MTU
@@ -231,8 +237,8 @@ public class Cli {
     //    println("      --isd-as isd-as          The local ISD-AS to use. (default 0-0)");
     //    println("  -l, --local ip               Local IP address to listen on. (default invalid
     // IP)");
-    //    println("      --log.level string       Console logging level verbosity
-    // (debug|info|error)");
+    println(
+        "      --log.level string       Console logging level verbosity (debug|info|warn|error)");
     //    println("      --no-color               disable colored output");
     println("      --port uint16            use specified local port");
     //    println("      --refresh                set refresh flag for path request");
@@ -288,8 +294,8 @@ public class Cli {
     println("  -h, --help                   help for showpaths");
     //    println("      --isd-as isd-as          The local ISD-AS to use. (default 0-0)");
     println("  -l, --local ip               Local IP address to listen on. (default invalid IP)");
-    //    println("      --log.level string       Console logging level verbosity
-    // (debug|info|error)");
+    println(
+        "      --log.level string       Console logging level verbosity (debug|info|warn|error)");
     println(
         "  -m, --maxpaths int           maximum number of paths that are displayed (default 10)");
     //    println("      --no-color               disable colored output");
@@ -320,6 +326,8 @@ public class Cli {
     println("Flags:");
     // println("  -l, --local ip               Local IP address to listen on. (default invalid
     // IP)");
+    println(
+        "      --log.level string       Console logging level verbosity (debug|info|warn|error)");
     println("      --port uint16            use specified local port.");
   }
 

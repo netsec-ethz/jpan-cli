@@ -25,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.scion.cli.util.Errors;
 import org.scion.cli.util.ExitCodeException;
 import org.scion.jpan.*;
 
@@ -43,18 +44,18 @@ import org.scion.jpan.*;
  */
 public class Showpaths {
 
-  private static long localIsdAs = 0;
-  private static InetAddress localIP = null;
-  private static InetSocketAddress daemon;
-  private static Long isdAs;
-  private static boolean extended = false;
-  private static int maxPaths = 10;
+  private long localIsdAs = 0;
+  private InetAddress localIP = null;
+  private InetSocketAddress daemon;
+  private Long isdAs;
+  private boolean extended = false;
+  private int maxPaths = 10;
 
   public static void main(String... args) {
-    handleExit(() -> run(args));
+    handleExit(() -> new Showpaths().run(args));
   }
 
-  public static void run(String... args) throws IOException {
+  public void run(String... args) throws IOException {
     parseArgs(args);
     if (daemon != null) {
       System.setProperty(Constants.PROPERTY_DAEMON, daemon.toString());
@@ -66,9 +67,17 @@ public class Showpaths {
     }
   }
 
-  private static void parseArgs(String[] argsArray) {
+  private void parseArgs(String[] argsArray) {
     List<String> args = new ArrayList<>(Arrays.asList(argsArray));
     while (!args.isEmpty()) {
+      if (!args.get(0).startsWith("-")) {
+        if (isdAs == null) {
+          isdAs = parseIsdAs(args);
+          continue;
+        }
+        throw new ExitCodeException(2, Errors.UNEXPECTED_NON_FLAG + args.get(0));
+      }
+
       switch (args.get(0)) {
         case "-e":
         case "--extended":
@@ -86,6 +95,9 @@ public class Showpaths {
         case "--local":
           localIP = parseIP("local", args);
           break;
+        case "--log.level":
+          parseAndSetLogLevel(args);
+          break;
         case "-m":
         case "--maxpaths":
           maxPaths = parseInt("--maxpaths", args);
@@ -94,12 +106,7 @@ public class Showpaths {
           daemon = parseAddress("sciond", args);
           break;
         default:
-          if (isdAs == null) {
-            isdAs = parseIsdAs(args);
-            continue;
-          } else {
-            throw new ExitCodeException(2, "Unknown option: " + args.get(0));
-          }
+          throw new ExitCodeException(2, Errors.UNKNOWN_OPTION + args.get(0));
       }
       args.remove(0);
     }
@@ -108,7 +115,7 @@ public class Showpaths {
     }
   }
 
-  public static void run() throws IOException {
+  public void run() throws IOException {
     ScionService service = Scion.defaultService();
     // dummy address
     InetSocketAddress destinationAddress =
@@ -117,7 +124,7 @@ public class Showpaths {
     if (paths.isEmpty()) {
       String src = ScionUtil.toStringIA(service.getLocalIsdAs());
       String dst = ScionUtil.toStringIA(isdAs);
-      throw new IOException("No path found from " + src + " to " + dst);
+      throw new ExitCodeException(1, "No path found from " + src + " to " + dst);
     }
 
     println("Available paths to " + ScionUtil.toStringIA(isdAs));
@@ -149,11 +156,6 @@ public class Showpaths {
                 + localIP;
         println(header + compact);
       }
-    }
-
-    if (paths.isEmpty()) {
-      throw new ExitCodeException(
-          1, "No paths found to destination: " + ScionUtil.toStringIA(isdAs));
     }
   }
 
