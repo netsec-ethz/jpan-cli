@@ -51,6 +51,9 @@ public class Traceroute {
     if (daemon != null) {
       System.setProperty(Constants.PROPERTY_DAEMON, daemon.toString());
     }
+    if (dstUrl == null && dstAddress == null) {
+      throw new ExitCodeException(2, "Error: missing address or --url");
+    }
     try {
       run();
     } finally {
@@ -113,11 +116,9 @@ public class Traceroute {
     List<Path> paths;
     if (dstUrl != null) {
       paths = service.lookupPaths(dstUrl, Constants.SCMP_PORT);
-    } else if (dstAddress != null) {
+    } else {
       paths =
           service.getPaths(dstAddress.getIsdAs(), dstAddress.getInetAddress(), Constants.SCMP_PORT);
-    } else {
-      throw new ExitCodeException(2, "Error: missing address or --url");
     }
 
     if (paths.isEmpty()) {

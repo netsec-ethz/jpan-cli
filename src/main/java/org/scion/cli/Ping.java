@@ -56,16 +56,17 @@ public class Ping {
     if (daemon != null) {
       System.setProperty(Constants.PROPERTY_DAEMON, daemon.toString());
     }
+    if (dstUrl == null && dstAddress == null) {
+      throw new ExitCodeException(2, "Error: missing address or --url");
+    }
     try {
       ScionService service = Scion.defaultService();
       if (dstUrl != null) {
         run(service.lookupPaths(dstUrl, Constants.SCMP_PORT));
-      } else if (dstAddress != null) {
+      } else {
         run(
             service.getPaths(
                 dstAddress.getIsdAs(), dstAddress.getInetAddress(), Constants.SCMP_PORT));
-      } else {
-        throw new ExitCodeException(2, "Error: missing address or --url");
       }
     } finally {
       Scion.closeDefault();
