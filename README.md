@@ -1,6 +1,6 @@
 # JPAN Command Line Tool
 
-A tool that allows echo, traceroute, showpaths, ... and other functionality, similar to
+A tool that allows `echo`, `traceroute`, `showpaths`, ... and other functionality, similar to
 to the [SCION CLI tool](https://docs.scion.org/en/latest/command/scion/scion.html).
 JPAN-CLI is stand-alone and does not require any locally installed SCION software. 
 
@@ -18,7 +18,7 @@ JPAN-CLI provides several tools:
 
 * `jpan-cli version` - Show the SCION version information
 
-## Execution
+## Usage
 
 All tools can be run from the executable jar file which is available in
 the [GitHub Releases section](https://github.com/netsec-ethz/jpan-cli/releases/download/v0.1.0/jpan-cli.jar).

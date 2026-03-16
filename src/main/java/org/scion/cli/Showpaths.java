@@ -108,7 +108,7 @@ public class Showpaths {
     }
   }
 
-  public static int run() throws IOException {
+  public static void run() throws IOException {
     ScionService service = Scion.defaultService();
     // dummy address
     InetSocketAddress destinationAddress =
@@ -150,7 +150,11 @@ public class Showpaths {
         println(header + compact);
       }
     }
-    return paths.size();
+
+    if (paths.isEmpty()) {
+      throw new ExitCodeException(
+          1, "No paths found to destination: " + ScionUtil.toStringIA(isdAs));
+    }
   }
 
   private static void printExtended(Path path, String localIP) {

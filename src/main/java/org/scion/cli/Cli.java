@@ -247,12 +247,16 @@ public class Cli {
     println("'showpaths' lists available paths between the local and the specified");
     println("SCION AS.");
     println("");
-    println("By default, the paths are probed. Paths served from the SCION Daemon's might not");
-    println("forward traffic successfully (e.g. if a network link went down, or there is a black");
-    println("hole on the path). To disable path probing, set the appropriate flag.");
+    println("Path probing: Unlike `scion`, jpan-cli does no path probing."); // TODO
+    //    println("By default, the paths are probed. Paths served from the SCION Daemon's might
+    // not");
+    //    println("forward traffic successfully (e.g. if a network link went down, or there is a
+    // black");
+    //    println("hole on the path). To disable path probing, set the appropriate flag.");
     println("");
-    println("If no alive path is discovered, json output is not enabled, and probing is not");
-    println("disabled, showpaths will exit with the code 1.");
+    //    println("If no alive path is discovered, json output is not enabled, and probing is not");
+    //    println("disabled, showpaths will exit with the code 1.");
+    println("If no alive path is discovered, showpaths will exit with the code 1."); // TODO
     println("On other errors, showpaths will exit with code 2.");
     //    println("");
     //    printSequenceHelp();
@@ -266,13 +270,14 @@ public class Cli {
     println("");
     println("Examples:");
     println("  jpan-cli showpaths 1-ff00:0:110 --extended");
-    println("  jpan-cli showpaths 1-ff00:0:110 --local 127.0.0.55 --json");
-    println("  jpan-cli showpaths 1-ff00:0:111 --sequence=\"0-0#2 0*\" # outgoing IfID=2");
-    println(
-        "  jpan-cli showpaths 1-ff00:0:111 --sequence=\"0* 0-0#41\" # incoming IfID=41 at dstIA");
-    println(
-        "  jpan-cli showpaths 1-ff00:0:111 --sequence=\"0* 1-ff00:0:112 0*\" # 1-ff00:0:112 on the path");
-    println("  jpan-cli showpaths 1-ff00:0:110 --no-probe");
+    // println("  jpan-cli showpaths 1-ff00:0:110 --local 127.0.0.55 --json");
+    // println("  jpan-cli showpaths 1-ff00:0:111 --sequence=\"0-0#2 0*\" # outgoing IfID=2");
+    // println(
+    //    "  jpan-cli showpaths 1-ff00:0:111 --sequence=\"0* 0-0#41\" # incoming IfID=41 at dstIA");
+    // println(
+    //     "  jpan-cli showpaths 1-ff00:0:111 --sequence=\"0* 1-ff00:0:112 0*\" # 1-ff00:0:112 on
+    // the path");
+    // println("  jpan-cli showpaths 1-ff00:0:110 --no-probe");
     println("");
     println("Flags:");
     //    println("      --epic                   Enable EPIC.");
