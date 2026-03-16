@@ -60,6 +60,6 @@ java -Dorg.scion.dnsSearchDomains=ethz.ch. -jar jpan-cli.jar
 
 # Acknowledgements
 
-Functionality and documentation borrow heavily from th original
-[`scion` tool](https://github.com/scionproto/scion/tree/master/scion)
+Functionality and documentation borrow heavily from the original
+[scion tool](https://github.com/scionproto/scion/tree/master/scion)
 ([docs](https://docs.scion.org/en/latest/command/scion/scion.html)). 
