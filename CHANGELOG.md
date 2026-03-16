@@ -9,8 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 -- Nothing yet
 
+### Added
+- Support for --log.level
+  [#4](https://github.com/netsec-ethz/scion-java-multiping/pull/4)
 
-### Changed
+### Fixed
 
 - Fixed showpaths issues.
   [#2](https://github.com/netsec-ethz/scion-java-multiping/pull/2)

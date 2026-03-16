@@ -22,6 +22,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.scion.cli.util.Errors;
 import org.scion.cli.util.ExitCodeException;
 import org.scion.cli.util.Util;
 import org.scion.jpan.*;
@@ -33,47 +34,55 @@ import org.scion.jpan.internal.ScionAddress;
  */
 public class Ping {
 
-  private static Integer localPort = -1;
-  private static int count = 10;
-  private static int intervalMs = 1000;
-  private static boolean startShim = false;
-  private static long localIsdAs = 0;
-  private static InetAddress localIP = null;
-  private static int payloadSize = 0;
-  private static ScionAddress dstAddress;
-  private static String dstUrl;
-  private static InetSocketAddress daemon;
-  private static int timeoutMs = 1000;
+  private Integer localPort = -1;
+  private int count = 10;
+  private int intervalMs = 1000;
+  private boolean startShim = false;
+  private long localIsdAs = 0;
+  private InetAddress localIP = null;
+  private int payloadSize = 0;
+  private ScionAddress dstAddress;
+  private String dstUrl;
+  private InetSocketAddress daemon;
+  private int timeoutMs = 1000;
 
   public static void main(String... args) {
-    handleExit(() -> run(args));
+    handleExit(() -> new Ping().run(args));
   }
 
-  public static void run(String... args) throws IOException {
+  public void run(String... args) throws IOException {
     parseArgs(args);
     System.setProperty(Constants.PROPERTY_SHIM, startShim ? "true" : "false"); // disable SHIM
     if (daemon != null) {
       System.setProperty(Constants.PROPERTY_DAEMON, daemon.toString());
     }
+    if (dstUrl == null && dstAddress == null) {
+      throw new ExitCodeException(2, "Error: missing address or --url");
+    }
     try {
       ScionService service = Scion.defaultService();
       if (dstUrl != null) {
         run(service.lookupPaths(dstUrl, Constants.SCMP_PORT));
-      } else if (dstAddress != null) {
+      } else {
         run(
             service.getPaths(
                 dstAddress.getIsdAs(), dstAddress.getInetAddress(), Constants.SCMP_PORT));
-      } else {
-        throw new ExitCodeException(2, "Error: missing address or --url");
       }
     } finally {
       Scion.closeDefault();
     }
   }
 
-  private static void parseArgs(String[] argsArray) {
+  private void parseArgs(String[] argsArray) {
     List<String> args = new ArrayList<>(Arrays.asList(argsArray));
     while (!args.isEmpty()) {
+      if (!args.get(0).startsWith("-")) {
+        if (dstAddress == null) {
+          dstAddress = parseScionAddress(args);
+          continue;
+        }
+        throw new ExitCodeException(2, Errors.UNEXPECTED_NON_FLAG + args.get(0));
+      }
       switch (args.get(0)) {
         case "-c":
         case "--count":
@@ -93,6 +102,9 @@ public class Ping {
         case "-l":
         case "--local":
           localIP = parseIP("local", args);
+          break;
+        case "--log.level":
+          parseAndSetLogLevel(args);
           break;
         case "--port":
           localPort = parseInt("port", args);
@@ -114,20 +126,13 @@ public class Ping {
           dstUrl = parseString("url", args);
           break;
         default:
-          if (dstAddress == null) {
-            dstAddress = parseScionAddress(args);
-            if (dstAddress != null) {
-              args.remove(0);
-              continue;
-            }
-          }
-          throw new ExitCodeException(2, "Unknown option: " + args.get(0));
+          throw new ExitCodeException(2, Errors.UNKNOWN_OPTION + args.get(0));
       }
       args.remove(0);
     }
   }
 
-  private static void run(List<Path> paths) throws IOException {
+  private void run(List<Path> paths) throws IOException {
     Path path = paths.get(0);
     ByteBuffer data = ByteBuffer.allocate(payloadSize);
     for (int i = 0; i < payloadSize; i++) {
