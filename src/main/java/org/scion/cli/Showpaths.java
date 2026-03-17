@@ -50,7 +50,7 @@ public class Showpaths {
   private boolean extended = false;
   private int maxPaths = 10;
   private Integer port;
-  private int timeoutMs = 5000;
+  private final int timeoutMs = 5000;
   private boolean probePath = true;
 
   public static void main(String... args) {
@@ -163,12 +163,17 @@ public class Showpaths {
                 + " NextHop: "
                 + path.getFirstHopAddress().getHostString()
                 + ":"
-                + path.getFirstHopAddress().getPort()
-                + " LocalIP: "
-                + localIP;
-        // TODO active?
+                + path.getFirstHopAddress().getPort();
+        if (probePath) {
+          compact += " Status: " + isActive.getOrDefault(id, Prober.Status.Unknown);
+        }
+        compact += " LocalIP: " + localIP;
         println(header + compact);
       }
+    }
+
+    if (probePath && isActive.isEmpty()) {
+      throw new ExitCodeException(2, "Error: no path alive");
     }
   }
 

@@ -37,11 +37,15 @@ public class Prober {
 
   private Prober() {}
 
-  public static Map<Integer, Status> probe(int port, int timeoutMs, List<Path> paths) {
+  public static Map<Integer, Status> probe(Integer port, int timeoutMs, List<Path> paths) {
     PingResponseHandler handler = new PingResponseHandler(paths.size());
 
     // Send all requests
-    try (ScmpSenderAsync sender = Scmp.newSenderAsyncBuilder(handler).setLocalPort(port).build()) {
+    ScmpSenderAsync.Builder builder = Scmp.newSenderAsyncBuilder(handler);
+    if (port != null) {
+      builder.setLocalPort(port);
+    }
+    try (ScmpSenderAsync sender = builder.build()) {
       sender.setTimeOut(timeoutMs);
       for (Path path : paths) {
         sender.sendTracerouteLast(path);
@@ -53,10 +57,6 @@ public class Prober {
       throw new ExitCodeException(2, e.getMessage());
     }
 
-    if (handler.result.size() < paths.size()) {
-      throw new ExitCodeException(
-          2, "Could not probe all paths: " + handler.result.size() + "/" + paths.size());
-    }
     return handler.result;
   }
 

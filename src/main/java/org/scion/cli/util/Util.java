@@ -115,6 +115,7 @@ public class Util {
       }
       System.exit(e.exitCode());
     } catch (Exception e) {
+      e.printStackTrace();
       System.exit(2);
     }
   }

@@ -32,6 +32,7 @@ public class Cli {
     System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "ERROR");
     handleExit(() -> run(args));
     // handleExit(() -> run(new String[] {"traceroute", "66-2:0:18,10.0.0.1"}));
+    // handleExit(() -> run(new String[] {"showpaths", "67-401500"}));
   }
 
   public static void run(String... args) throws IOException {
@@ -253,16 +254,13 @@ public class Cli {
     println("'showpaths' lists available paths between the local and the specified");
     println("SCION AS.");
     println("");
-    println("Path probing: Unlike `scion`, jpan-cli does no path probing."); // TODO
-    //    println("By default, the paths are probed. Paths served from the SCION Daemon's might
-    // not");
-    //    println("forward traffic successfully (e.g. if a network link went down, or there is a
-    // black");
-    //    println("hole on the path). To disable path probing, set the appropriate flag.");
+    println("By default, the paths are probed. Paths served from the SCION Daemon's might not");
+    println("forward traffic successfully (e.g. if a network link went down, or there is a black");
+    println("hole on the path). To disable path probing, set the appropriate flag.");
     println("");
-    //    println("If no alive path is discovered, json output is not enabled, and probing is not");
-    //    println("disabled, showpaths will exit with the code 1.");
-    println("If no alive path is discovered, showpaths will exit with the code 1."); // TODO
+    // println("If no alive path is discovered, json output is not enabled, and probing is not");
+    println("If no alive path is discovered, and probing is not");
+    println("disabled, showpaths will exit with the code 1.");
     println("On other errors, showpaths will exit with code 2.");
     //    println("");
     //    printSequenceHelp();
