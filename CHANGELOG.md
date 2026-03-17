@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 -- Nothing yet
 
+## [0.2.0] - 2026-03-17
+
 ### Added
 - Support for --log.level
   [#4](https://github.com/netsec-ethz/scion-java-multiping/pull/4)
@@ -42,6 +44,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Nothing
 
-[Unreleased]: https://github.com/netsec-ethz/scion-java-multiping/compare/v0.1.0...HEAD
-[0.2.0]: https://github.com/netsec-ethz/scion-java-multiping/compare/v0.1.0...v0.0.1
-[0.1.0]: https://github.com/netsec-ethz/scion-java-multiping/compare/init_root_commit...v0.1.0
+[Unreleased]: https://github.com/netsec-ethz/jpan-cli/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/netsec-ethz/sjpan-cli/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/netsec-ethz/jpan-cli/compare/init_root_commit...v0.1.0
