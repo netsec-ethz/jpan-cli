@@ -19,11 +19,10 @@ import static org.scion.cli.util.Util.*;
 import java.io.*;
 import java.net.*;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import org.scion.cli.util.Errors;
 import org.scion.cli.util.ExitCodeException;
+import org.scion.cli.util.Prober;
 import org.scion.cli.util.Util;
 import org.scion.jpan.*;
 import org.scion.jpan.internal.ScionAddress;
@@ -45,6 +44,8 @@ public class Ping {
   private String dstUrl;
   private InetSocketAddress daemon;
   private int timeoutMs = 1000;
+  private boolean healthyOnly = false;
+  private final Random rnd = new Random();
 
   public static void main(String... args) {
     handleExit(() -> new Ping().run(args));
@@ -61,13 +62,20 @@ public class Ping {
     }
     try {
       ScionService service = Scion.defaultService();
+      List<Path> paths;
       if (dstUrl != null) {
-        run(service.lookupPaths(dstUrl, Constants.SCMP_PORT));
+        paths = service.lookupPaths(dstUrl, Constants.SCMP_PORT);
       } else {
-        run(
+        paths =
             service.getPaths(
-                dstAddress.getIsdAs(), dstAddress.getInetAddress(), Constants.SCMP_PORT));
+                dstAddress.getIsdAs(), dstAddress.getInetAddress(), Constants.SCMP_PORT);
       }
+      if (paths.isEmpty()) {
+        String src = ScionUtil.toStringIA(service.getLocalIsdAs());
+        String dst = ScionUtil.toStringIA(dstAddress.getIsdAs());
+        throw new ExitCodeException(2, "No path found from " + src + " to " + dst);
+      }
+      run(paths);
     } finally {
       Scion.closeDefault();
     }
@@ -92,6 +100,9 @@ public class Ping {
         case "--help":
           Cli.printUsagePing();
           throw new ExitCodeException(0);
+        case "--healthy-only":
+          healthyOnly = true;
+          break;
         case "--interval":
           intervalMs = parseInt("interval", args);
           break;
@@ -133,7 +144,25 @@ public class Ping {
   }
 
   private void run(List<Path> paths) throws IOException {
-    Path path = paths.get(0);
+    Path path;
+    if (healthyOnly) {
+      Map<Integer, Prober.Status> isActive = Prober.probe(localPort, timeoutMs, paths);
+      List<Path> newPaths = new ArrayList<>();
+      for (int i = 0; i < paths.size(); i++) {
+        if (isActive.getOrDefault(i, Prober.Status.Unknown) == Prober.Status.Alive) {
+          newPaths.add(paths.get(i));
+        }
+      }
+      if (newPaths.isEmpty()) {
+        String src = ScionUtil.toStringIA(Scion.defaultService().getLocalIsdAs());
+        String dst = ScionUtil.toStringIA(dstAddress.getIsdAs());
+        throw new ExitCodeException(2, "No path found from " + src + " to " + dst);
+      }
+      path = newPaths.get(rnd.nextInt(paths.size()));
+    } else {
+      path = paths.get(0);
+    }
+
     ByteBuffer data = ByteBuffer.allocate(payloadSize);
     for (int i = 0; i < payloadSize; i++) {
       data.put((byte) i);

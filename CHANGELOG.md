@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   [#4](https://github.com/netsec-ethz/scion-java-multiping/pull/4)
 - Added path probing for showpaths and --no-probe
   [#5](https://github.com/netsec-ethz/scion-java-multiping/pull/5)
+- Added path probing for ping and --healthy-only
+  [#6](https://github.com/netsec-ethz/scion-java-multiping/pull/6)
 
 ### Fixed
 

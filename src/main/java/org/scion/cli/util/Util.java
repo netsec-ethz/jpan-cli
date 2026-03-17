@@ -22,6 +22,9 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.function.Supplier;
+import org.scion.jpan.Scion;
+import org.scion.jpan.ScionService;
 import org.scion.jpan.ScionUtil;
 import org.scion.jpan.internal.IPHelper;
 import org.scion.jpan.internal.ScionAddress;
@@ -31,8 +34,17 @@ public class Util {
   public static boolean PRINT = true;
   public static boolean DELAYED_PRINT = false; // print only at newlines
   private static final StringBuilder sb = new StringBuilder();
+  private static Supplier<ScionService> serviceSupplier = Scion::defaultService;
 
   private Util() {}
+
+  public static void setServiceSupplier(Supplier<ScionService> serviceSupplier) {
+    Util.serviceSupplier = serviceSupplier;
+  }
+
+  public static ScionService defaultService() {
+    return serviceSupplier.get();
+  }
 
   public static void sleep(long millis) {
     try {
