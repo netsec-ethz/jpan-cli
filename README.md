@@ -1,9 +1,12 @@
 # JPAN Command Line Tool
 
-A tool that allows `echo`, `traceroute`, `showpaths`, ... and other functionality, similar to
-to the [SCION CLI tool](https://docs.scion.org/en/latest/command/scion/scion.html).
+JPAN-CLI is a tool that allows `echo`, `traceroute`, `showpaths`, ... and other functionality, 
+similar to the [SCION CLI tool](https://docs.scion.org/en/latest/command/scion/scion.html).
 JPAN-CLI is stand-alone based on [JPAN](https://github.com/scionproto-contrib/jpan)
 and does not require any locally installed SCION software. 
+
+The executable `jar` can be found in the 
+[GitHub Releases section](https://github.com/netsec-ethz/jpan-cli/releases/download/v0.2.0/jpan-cli.jar). 
 
 JPAN-CLI provides several tools:
 
@@ -21,8 +24,8 @@ JPAN-CLI provides several tools:
 
 ## Usage
 
-All tools can be run from the executable jar file which is available in
-the [GitHub Releases section](https://github.com/netsec-ethz/jpan-cli/releases/download/v0.2.0/jpan-cli.jar).
+All tools can be run from the executable jar file which is available in the 
+[GitHub Releases section](https://github.com/netsec-ethz/jpan-cli/releases/download/v0.2.0/jpan-cli.jar).
 It can be executed with:
 
 ```
@@ -37,9 +40,9 @@ java -jar jpan-cli.jar help
 
 ## Known Issues
 
-* In JPAN 0.6.1, the SCMP Responder will always return packets to 30041, regardless of their 
-  actual source port, see JPAN issue [#233](https://github.com/scionproto-contrib/jpan/issues/233).
-* jpan-cli should either start on 30041 or start a SHIM (if dispatcher portrange is limited)
+* jpan-cli should detect automatically if the AS dispatcher range is limited and then
+  either start on 30041 or start a SHIM. 
+  See [issue #8](https://github.com/netsec-ethz/jpan-cli/issues/8).
 
 # Troubleshooting
 

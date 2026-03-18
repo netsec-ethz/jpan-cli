@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 import org.scion.cli.util.Errors;
 import org.scion.cli.util.ExitCodeException;
-import org.scion.cli.util.Util;
 import org.scion.jpan.*;
 
 /** A simple echo responder that responds to SCMP echo requests. */
@@ -44,7 +43,6 @@ public class PingResponder {
 
     try (ScmpResponder responder = Scmp.newResponderBuilder().setLocalPort(localPort).build()) {
       responder.setScmpErrorListener(PingResponder::logError);
-      responder.setOption(ScionSocketOptions.SCION_API_THROW_PARSER_FAILURE, true);
       responder.setScmpEchoListener(PingResponder::log);
       println("Starting ping responder on port: " + localPort);
       println("Stop with \"ctrl-c\"");
@@ -78,13 +76,13 @@ public class PingResponder {
   }
 
   private static boolean log(Scmp.EchoMessage msg) {
-    Util.print(
+    print(
         "Received: "
             + msg.getTypeCode().getText()
             + " from "
             + msg.getPath().getRemoteAddress().getHostAddress()
             + " via ");
-    Util.println(ScionUtil.toStringPath(msg.getPath().getRawPath()));
+    println(ScionUtil.toStringPath(msg.getPath().getRawPath()));
     return true;
   }
 
