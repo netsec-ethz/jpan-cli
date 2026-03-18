@@ -2,7 +2,8 @@
 
 A tool that allows `echo`, `traceroute`, `showpaths`, ... and other functionality, similar to
 to the [SCION CLI tool](https://docs.scion.org/en/latest/command/scion/scion.html).
-JPAN-CLI is stand-alone and does not require any locally installed SCION software. 
+JPAN-CLI is stand-alone based on [JPAN](https://github.com/scionproto-contrib/jpan)
+and does not require any locally installed SCION software. 
 
 JPAN-CLI provides several tools:
 
