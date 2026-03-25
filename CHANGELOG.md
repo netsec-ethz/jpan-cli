@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 -- Nothing yet
 
+
+- Fixed showpaths showing wrong path status (of by 1 error).
+  [#9](https://github.com/netsec-ethz/scion-java-multiping/pull/9)
+
 ## [0.2.0] - 2026-03-17
 
 ### Added

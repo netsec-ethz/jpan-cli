@@ -141,21 +141,18 @@ public class Showpaths {
 
     println("Available paths to " + ScionUtil.toStringIA(isdAs));
 
-    int id = 0;
-    for (Path path : paths) {
-      if (id >= maxPaths) {
-        break;
-      }
-      String localIP;
+    for (int id = 0; id < paths.size() && id < maxPaths; id++) {
+      Path path = paths.get(id);
+      String detectedLocalIP;
       try (ScionDatagramChannel channel = ScionDatagramChannel.open()) {
         channel.connect(path);
-        localIP = channel.getLocalAddress().getAddress().getHostAddress();
+        detectedLocalIP = channel.getLocalAddress().getAddress().getHostAddress();
       }
       PathMetadata meta = path.getMetadata();
-      String header = "[" + id++ + "] Hops: " + ScionUtil.toStringPath(meta);
+      String header = "[" + id + "] Hops: " + ScionUtil.toStringPath(meta);
       if (extended) {
         println(header);
-        printExtended(path, localIP, isActive.getOrDefault(id, Prober.Status.Unknown));
+        printExtended(path, detectedLocalIP, isActive.getOrDefault(id, Prober.Status.Unknown));
       } else {
         String compact =
             " MTU: "
@@ -167,7 +164,7 @@ public class Showpaths {
         if (probePath) {
           compact += " Status: " + isActive.getOrDefault(id, Prober.Status.Unknown);
         }
-        compact += " LocalIP: " + localIP;
+        compact += " LocalIP: " + detectedLocalIP;
         println(header + compact);
       }
     }
