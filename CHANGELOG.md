@@ -9,14 +9,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 -- Nothing yet
 
+### Fixed
+
 - Fixed local port option fow showpaths probing, document --healthy-only for ping and traceroute.
   [#11](https://github.com/netsec-ethz/scion-java-multiping/pull/11)
 - Enable SHIM by default. Fix for #8.
   [#12](https://github.com/netsec-ethz/scion-java-multiping/pull/12)
 - Improve SCMP error handling.
   [#13](https://github.com/netsec-ethz/scion-java-multiping/pull/13)
+- Local AS causes exception.
+  [#15](https://github.com/netsec-ethz/scion-java-multiping/pull/15)
 
 ## [0.2.1] - 2026-03-27
+
+### Fixed
 
 - Fixed showpaths showing wrong path status (of by 1 error).
   [#9](https://github.com/netsec-ethz/scion-java-multiping/pull/9)

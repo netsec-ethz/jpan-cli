@@ -39,6 +39,13 @@ public class Prober {
   private Prober() {}
 
   public static Map<Integer, Status> probe(Integer port, int timeoutMs, List<Path> paths) {
+    if (paths.size() == 1 && paths.get(0).getRawPath().length == 0) {
+      // emtpy path
+      Map<Integer, Status> result = new HashMap<>();
+      result.put(0, Status.Alive);
+      return result;
+    }
+
     PingResponseHandler handler = new PingResponseHandler(paths.size(), timeoutMs);
 
     // Send all requests
