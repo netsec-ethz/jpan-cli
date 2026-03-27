@@ -6,7 +6,8 @@ JPAN-CLI is stand-alone based on [JPAN](https://github.com/scionproto-contrib/jp
 and does not require any locally installed SCION software. 
 
 The executable `jar` can be found in the 
-[GitHub Releases section](https://github.com/netsec-ethz/jpan-cli/releases/download/v0.2.0/jpan-cli.jar). 
+[GitHub Releases section](https://github.com/netsec-ethz/jpan-cli/releases/download/v0.2.0/jpan-cli.jar) or it can be downloaded with 
+`wget https://github.com/netsec-ethz/jpan-cli/releases/download/v0.2.1/jpan-cli.jar`. 
 
 JPAN-CLI provides several tools:
 
