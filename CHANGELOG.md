@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 -- Nothing yet
 
+- Fixed local port option fow showpaths probing, document --healthy-only for ping and traceroute.
+  
+  [#11](https://github.com/netsec-ethz/scion-java-multiping/pull/11)
+
 ## [0.2.1] - 2026-03-27
 
 - Fixed showpaths showing wrong path status (of by 1 error).

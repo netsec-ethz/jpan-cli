@@ -33,7 +33,7 @@ import org.scion.jpan.internal.ScionAddress;
  */
 public class Ping {
 
-  private Integer localPort = -1;
+  private Integer localPort;
   private int count = 10;
   private int intervalMs = 1000;
   private boolean startShim = false;
@@ -158,7 +158,7 @@ public class Ping {
         String dst = ScionUtil.toStringIA(dstAddress.getIsdAs());
         throw new ExitCodeException(2, "No path found from " + src + " to " + dst);
       }
-      path = newPaths.get(rnd.nextInt(paths.size()));
+      path = newPaths.get(rnd.nextInt(newPaths.size()));
     } else {
       path = paths.get(0);
     }

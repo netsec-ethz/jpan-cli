@@ -43,13 +43,13 @@ import org.scion.jpan.*;
  */
 public class Showpaths {
 
+  private Integer localPort;
   private long localIsdAs = 0;
   private InetAddress localIP = null;
   private InetSocketAddress daemon;
   private Long isdAs;
   private boolean extended = false;
   private int maxPaths = 10;
-  private Integer port;
   private final int timeoutMs = 5000;
   private boolean probePath = true;
 
@@ -107,6 +107,9 @@ public class Showpaths {
         case "--no-probe":
           probePath = false;
           break;
+        case "--port":
+          localPort = parseInt("port", args);
+          break;
         case "--sciond":
           daemon = parseAddress("sciond", args);
           break;
@@ -134,7 +137,7 @@ public class Showpaths {
 
     Map<Integer, Prober.Status> isActive;
     if (probePath) {
-      isActive = Prober.probe(port, timeoutMs, paths);
+      isActive = Prober.probe(localPort, timeoutMs, paths);
     } else {
       isActive = new HashMap<>();
     }
