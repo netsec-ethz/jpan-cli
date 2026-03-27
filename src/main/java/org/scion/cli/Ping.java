@@ -20,6 +20,7 @@ import java.io.*;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.scion.cli.util.Errors;
 import org.scion.cli.util.ExitCodeException;
 import org.scion.cli.util.Prober;
@@ -183,31 +184,47 @@ public class Ping {
     if (localPort != null) {
       builder.setLocalPort(localPort);
     }
+    // No concurrency, but must be final
+    AtomicBoolean scmpError = new AtomicBoolean(false);
     try (ScmpSender sender = builder.build()) {
       sender.setTimeOut(timeoutMs);
+      sender.setScmpErrorListener(
+          e -> {
+            println("SCMP Error: " + e.getTypeCode().getText());
+            scmpError.set(true);
+          });
       println("Listening on port " + sender.getLocalAddress().getPort() + " ...");
       println("Resolved local address: ");
       println("  " + localAddress);
       printPath(path);
 
       for (int i = 0; i < count; i++) {
-        Scmp.EchoMessage msg = sender.sendEchoRequest(path, data);
-        if (i == 0) {
-          printHeader(path.getRemoteSocketAddress(), data, msg);
-        }
-        String millis = String.format("%.3f", msg.getNanoSeconds() / (double) 1_000_000);
-        String echoMsgStr = msg.getSizeReceived() + " bytes from ";
-        InetAddress addr = msg.getPath().getRemoteAddress();
-        echoMsgStr += ScionUtil.toStringIA(path.getRemoteIsdAs()) + "," + addr.getHostAddress();
-        echoMsgStr += ": scmp_seq=" + msg.getSequenceNumber();
-        if (msg.isTimedOut()) {
-          echoMsgStr += " Timed out after";
-          nTimeouts++;
-        }
-        echoMsgStr += " time=" + millis + "ms";
-        println(echoMsgStr);
-        if (i < count - 1) {
-          Util.sleep(intervalMs);
+        // TODO this may throw an IOException if external interface is down
+        try {
+          Scmp.EchoMessage msg = sender.sendEchoRequest(path, data);
+          if (i == 0) {
+            printHeader(path.getRemoteSocketAddress(), data, msg);
+          }
+          String millis = String.format("%.3f", msg.getNanoSeconds() / (double) 1_000_000);
+          String echoMsgStr = msg.getSizeReceived() + " bytes from ";
+          InetAddress addr = msg.getPath().getRemoteAddress();
+          echoMsgStr += ScionUtil.toStringIA(path.getRemoteIsdAs()) + "," + addr.getHostAddress();
+          echoMsgStr += ": scmp_seq=" + msg.getSequenceNumber();
+          if (msg.isTimedOut()) {
+            echoMsgStr += " Timed out after";
+            nTimeouts++;
+          }
+          echoMsgStr += " time=" + millis + "ms";
+          println(echoMsgStr);
+          if (i < count - 1) {
+            Util.sleep(intervalMs);
+          }
+        } catch (IOException e) {
+          if (scmpError.getAndSet(false)) {
+            // Ignore, we already reported the error
+            continue;
+          }
+          throw e;
         }
       }
     }
