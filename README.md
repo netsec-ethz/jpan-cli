@@ -5,10 +5,6 @@ similar to the [SCION CLI tool](https://docs.scion.org/en/latest/command/scion/s
 JPAN-CLI is stand-alone based on [JPAN](https://github.com/scionproto-contrib/jpan)
 and does not require any locally installed SCION software. 
 
-The executable `jar` can be found in the 
-[GitHub Releases section](https://github.com/netsec-ethz/jpan-cli/releases/download/v0.2.1/jpan-cli.jar) or it can be downloaded with 
-`wget https://github.com/netsec-ethz/jpan-cli/releases/download/v0.2.1/jpan-cli.jar`. 
-
 JPAN-CLI provides several tools:
 
 * `jpan-cli address` - Show (one of) this host’s SCION address(es)
@@ -25,8 +21,12 @@ JPAN-CLI provides several tools:
 
 ## Usage
 
-All tools can be run from the executable jar file which is available in the 
-[GitHub Releases section](https://github.com/netsec-ethz/jpan-cli/releases/download/v0.2.1/jpan-cli.jar).
+The tool can be run from the executable `jar` file which is available in the 
+[GitHub Releases section](https://github.com/netsec-ethz/jpan-cli/releases/download/v0.2.2/jpan-cli.jar)
+or with:
+
+`wget https://github.com/netsec-ethz/jpan-cli/releases/download/v0.2.2/jpan-cli.jar`.
+
 It can be executed with:
 
 ```
