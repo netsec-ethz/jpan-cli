@@ -48,6 +48,8 @@ when you are using WLAN.
 Some border routers support NAT traversal. NAT support can be enabled with
 `java -Dorg.scion.nat=auto -jar jpan-cli.jar showpaths [your destination]`.
 
+With `ping` and `traceroute`, another option is to use `--healthy-only` to avoid
+using a path that is broken.
 
 ## No DNS search domain found. Please check your /etc/resolv.conf or similar.
 

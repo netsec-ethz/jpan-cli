@@ -19,6 +19,7 @@ import static org.scion.cli.util.Util.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.scion.cli.util.Errors;
 import org.scion.cli.util.ExitCodeException;
 import org.scion.cli.util.Prober;
@@ -164,13 +165,21 @@ public class Traceroute {
     if (localPort != null) {
       builder.setLocalPort(localPort);
     }
+    // No concurrency, but must be final
+    AtomicBoolean scmpError = new AtomicBoolean(false);
     try (ScmpSender sender = builder.build()) {
       sender.setTimeOut(timeoutMs);
+      sender.setScmpErrorListener(
+          e -> {
+            println("SCMP Error: " + e.getTypeCode().getText());
+            scmpError.set(true);
+          });
       println("Listening on port " + sender.getLocalAddress().getPort() + " ...");
       println("Resolved local address: ");
       println("  " + localAddress);
       printPath(path);
 
+      // TODO this may throw an IOException if external interface is down
       List<Scmp.TracerouteMessage> results = sender.sendTracerouteRequest(path);
       int nTimeouts = 0;
       for (Scmp.TracerouteMessage msg : results) {
@@ -192,6 +201,12 @@ public class Traceroute {
         }
         throw new ExitCodeException(1, "Number of timeouts: " + nTimeouts + msg);
       }
+    } catch (IOException e) {
+      if (scmpError.getAndSet(false)) {
+        // Ignore, we already reported the error
+        return;
+      }
+      throw e;
     }
   }
 
