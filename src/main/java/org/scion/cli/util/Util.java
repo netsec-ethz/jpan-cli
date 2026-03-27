@@ -23,11 +23,13 @@ import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
+import org.scion.jpan.Constants;
 import org.scion.jpan.Scion;
 import org.scion.jpan.ScionService;
 import org.scion.jpan.ScionUtil;
 import org.scion.jpan.internal.IPHelper;
 import org.scion.jpan.internal.ScionAddress;
+import org.scion.jpan.internal.Shim;
 
 public class Util {
 
@@ -90,27 +92,19 @@ public class Util {
     return Math.round(d * div) / div;
   }
 
-  public static class Ref<T> {
-    private T t;
-
-    private Ref(T t) {
-      this.t = t;
+  public static void prepareShim(boolean startShim, Integer port) {
+    if (startShim && port != null && port.equals(Constants.SCMP_PORT)) {
+      throw new ExitCodeException(
+          2,
+          "Cannot use port 30041 while SHIM is enabled. "
+              + "Please choose a different port or use --no-shim");
     }
-
-    public static <T> Ref<T> empty() {
-      return new Ref<>(null);
-    }
-
-    public static <T> Ref<T> of(T t) {
-      return new Ref<>(t);
-    }
-
-    public T get() {
-      return t;
-    }
-
-    public void set(T t) {
-      this.t = t;
+    System.setProperty(Constants.PROPERTY_SHIM, Boolean.toString(startShim));
+    if (startShim) {
+      Shim.install();
+      if (!Shim.isInstalled()) {
+        throw new ExitCodeException(2, "Could not start SHIM, port 30041 is already in use.");
+      }
     }
   }
 

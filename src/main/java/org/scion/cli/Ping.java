@@ -36,7 +36,7 @@ public class Ping {
   private Integer localPort;
   private int count = 10;
   private int intervalMs = 1000;
-  private boolean startShim = false;
+  private boolean startShim = true;
   private long localIsdAs = 0;
   private InetAddress localIP = null;
   private int payloadSize = 0;
@@ -53,7 +53,7 @@ public class Ping {
 
   public void run(String... args) throws IOException {
     parseArgs(args);
-    System.setProperty(Constants.PROPERTY_SHIM, startShim ? "true" : "false"); // disable SHIM
+    prepareShim(startShim, localPort);
     if (daemon != null) {
       System.setProperty(Constants.PROPERTY_DAEMON, daemon.toString());
     }
@@ -116,6 +116,9 @@ public class Ping {
           break;
         case "--log.level":
           parseAndSetLogLevel(args);
+          break;
+        case "--no-shim":
+          startShim = false;
           break;
         case "--port":
           localPort = parseInt("port", args);

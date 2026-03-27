@@ -46,6 +46,7 @@ public class Showpaths {
   private Integer localPort;
   private long localIsdAs = 0;
   private InetAddress localIP = null;
+  private boolean startShim = true;
   private InetSocketAddress daemon;
   private Long isdAs;
   private boolean extended = false;
@@ -59,6 +60,7 @@ public class Showpaths {
 
   public void run(String... args) throws IOException {
     parseArgs(args);
+    prepareShim(startShim, localPort);
     if (daemon != null) {
       System.setProperty(Constants.PROPERTY_DAEMON, daemon.toString());
     }
@@ -106,6 +108,9 @@ public class Showpaths {
           break;
         case "--no-probe":
           probePath = false;
+          break;
+        case "--no-shim":
+          startShim = false;
           break;
         case "--port":
           localPort = parseInt("port", args);
