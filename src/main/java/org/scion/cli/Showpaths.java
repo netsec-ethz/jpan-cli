@@ -169,8 +169,9 @@ public class Showpaths {
       }
     }
 
-    if (probePath && isActive.isEmpty()) {
-      throw new ExitCodeException(2, "Error: no path alive");
+    if (probePath && !isActive.containsValue(Prober.Status.Alive)) {
+      throw new ExitCodeException(
+          2, "Error: no path alive. See documentation for possible solutions.");
     }
   }
 
