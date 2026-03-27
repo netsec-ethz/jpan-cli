@@ -32,7 +32,7 @@ import org.scion.jpan.internal.ScionAddress;
 public class Traceroute {
 
   private Integer localPort;
-  private boolean startShim = false;
+  private boolean startShim = true;
   private long localIsdAs = 0;
   private InetAddress localIP = null;
   private ScionAddress dstAddress;
@@ -48,7 +48,7 @@ public class Traceroute {
 
   public void run(String... args) throws IOException {
     parseArgs(args);
-    System.setProperty(Constants.PROPERTY_SHIM, startShim ? "true" : "false"); // disable SHIM
+    prepareShim(startShim, localPort);
     if (daemon != null) {
       System.setProperty(Constants.PROPERTY_DAEMON, daemon.toString());
     }
@@ -91,6 +91,9 @@ public class Traceroute {
           break;
         case "--log.level":
           parseAndSetLogLevel(args);
+          break;
+        case "--no-shim":
+          startShim = false;
           break;
         case "--port":
           localPort = parseInt("port", args);

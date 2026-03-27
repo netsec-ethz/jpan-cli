@@ -15,6 +15,7 @@
 package org.scion.cli.util;
 
 import java.io.IOException;
+import java.net.BindException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
@@ -54,6 +55,11 @@ public class Prober {
       // Wait for all messages to be received, BEFORE closing the "sender".
       handler.await();
     } catch (IOException e) {
+      throw new ExitCodeException(2, e.getMessage());
+    } catch (ScionRuntimeException e) {
+      if (port != null && port == 30041 && e.getCause() instanceof BindException) {
+        throw new ExitCodeException(2, e.getMessage() + ". Port 30041 appears to be in use.");
+      }
       throw new ExitCodeException(2, e.getMessage());
     }
 
