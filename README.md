@@ -48,8 +48,14 @@ java -jar jpan-cli.jar help
 
 ## No ping/traceroute answers received
 
-In some ASes, border routers will send return packets to port 30041. To receive these packets,
-please start the tool with `--port 30041`.
+There can be several reasons for this:
+
+- In some ASes, border routers will send return packets to port 30041. To receive these packets,
+  please start the tool with `--port 30041`.
+- There is a NAT or proxy between your machine and the border router. This is a likely scenario
+  when you are using WLAN.
+  Some border routers support NAT traversal. NAT support can be enabled with
+  `java -Dorg.scion.nat=auto -jar jpan-cli.jar showpaths [your destination]`.
 
 
 ## No DNS search domain found. Please check your /etc/resolv.conf or similar.

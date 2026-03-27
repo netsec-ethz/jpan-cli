@@ -38,7 +38,7 @@ public class Prober {
   private Prober() {}
 
   public static Map<Integer, Status> probe(Integer port, int timeoutMs, List<Path> paths) {
-    PingResponseHandler handler = new PingResponseHandler(paths.size());
+    PingResponseHandler handler = new PingResponseHandler(paths.size(), timeoutMs);
 
     // Send all requests
     ScmpSenderAsync.Builder builder = Scmp.newSenderAsyncBuilder(handler);
@@ -65,9 +65,11 @@ public class Prober {
     private final CountDownLatch barrier;
     private final AtomicInteger errors = new AtomicInteger();
     private final int nPaths;
+    private final int timeoutMs;
 
-    private PingResponseHandler(int nPaths) {
+    private PingResponseHandler(int nPaths, int timeoutMs) {
       this.nPaths = nPaths;
+      this.timeoutMs = timeoutMs;
       barrier = new CountDownLatch(nPaths);
     }
 
@@ -98,7 +100,8 @@ public class Prober {
 
     void await() {
       try {
-        if (!barrier.await(1100, TimeUnit.MILLISECONDS)) {
+        // Wait timeout + x. By then all pings should have timed out.
+        if (!barrier.await(timeoutMs + 100L, TimeUnit.MILLISECONDS)) {
           throw new IllegalStateException("Missing messages: " + barrier.getCount() + "/" + nPaths);
         }
       } catch (InterruptedException e) {
