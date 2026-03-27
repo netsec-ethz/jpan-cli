@@ -157,10 +157,11 @@ public class Cli {
     println("When the --count option is set, ping sends the specified number of SCMP echo packets");
     println("and reports back the statistics.");
     println("");
-    //    println("When the --healthy-only option is set, ping first determines healthy paths
-    // through probing and");
-    //    println("chooses amongst them.");
-    //    println("");
+    println(
+        "When the --healthy-only option is set, ping first determines healthy paths through "
+            + "probing and");
+    println("chooses amongst them.");
+    println("");
     println("If no reply packet is received at all, ping will exit with code 1.");
     println("On other errors, ping will exit with code 2.");
     println("");
@@ -180,7 +181,7 @@ public class Cli {
     //    println("      --epic                   Enable EPIC for path probing.");
     //    println("      --format string          Specify the output format (human|json|yaml)
     // (default \"human\")");
-    //    println("      --healthy-only           only use healthy paths");
+    println("      --healthy-only           only use healthy paths");
     println("  -h, --help                   help for ping");
     //    println("  -i, --interactive            interactive mode");
     println("      --interval duration      time between packets (default 1s)");
@@ -216,6 +217,11 @@ public class Cli {
     println("'traceroute' traces the SCION path to a remote AS using");
     println("SCMP traceroute packets.");
     println("");
+    println(
+        "When the --healthy-only option is set, traceroute first determines healthy paths "
+            + "through probing and");
+    println("chooses amongst them.");
+    println("");
     println("If any packet is dropped, traceroute will exit with code 1.");
     println("On other errors, traceroute will exit with code 2.");
     //    printSequenceHelp();
@@ -233,6 +239,7 @@ public class Cli {
     //    println("      --epic                   Enable EPIC.");
     //    println("      --format string          Specify the output format (human|json|yaml)
     // (default \"human\")");
+    println("      --healthy-only           only use healthy paths");
     println("  -h, --help                   help for traceroute");
     //    println("  -i, --interactive            interactive mode");
     //    println("      --isd-as isd-as          The local ISD-AS to use. (default 0-0)");

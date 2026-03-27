@@ -18,11 +18,10 @@ import static org.scion.cli.util.Util.*;
 
 import java.io.*;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import org.scion.cli.util.Errors;
 import org.scion.cli.util.ExitCodeException;
+import org.scion.cli.util.Prober;
 import org.scion.jpan.*;
 import org.scion.jpan.internal.ScionAddress;
 
@@ -40,6 +39,8 @@ public class Traceroute {
   private String dstUrl;
   private InetSocketAddress daemon;
   private int timeoutMs = 1000;
+  private boolean healthyOnly = false;
+  private final Random rnd = new Random();
 
   public static void main(String... args) {
     handleExit(() -> new Traceroute().run(args));
@@ -77,6 +78,9 @@ public class Traceroute {
         case "--help":
           Cli.printUsageTraceroute();
           throw new ExitCodeException(0);
+        case "--healthy-only":
+          healthyOnly = true;
+          break;
         case "--isd-as":
           localIsdAs =
               tryParse("isd-as", args.get(1), () -> ScionUtil.parseIA(parseString("isd-as", args)));
@@ -126,7 +130,25 @@ public class Traceroute {
       String dst = ScionUtil.toStringIA(dstAddress.getIsdAs());
       throw new ExitCodeException(2, "No path found from " + src + " to " + dst);
     }
-    Path path = paths.get(0);
+
+    Path path;
+    if (healthyOnly) {
+      Map<Integer, Prober.Status> isActive = Prober.probe(localPort, timeoutMs, paths);
+      List<Path> newPaths = new ArrayList<>();
+      for (int i = 0; i < paths.size(); i++) {
+        if (isActive.getOrDefault(i, Prober.Status.Unknown) == Prober.Status.Alive) {
+          newPaths.add(paths.get(i));
+        }
+      }
+      if (newPaths.isEmpty()) {
+        String src = ScionUtil.toStringIA(Scion.defaultService().getLocalIsdAs());
+        String dst = ScionUtil.toStringIA(dstAddress.getIsdAs());
+        throw new ExitCodeException(2, "No path found from " + src + " to " + dst);
+      }
+      path = newPaths.get(rnd.nextInt(newPaths.size()));
+    } else {
+      path = paths.get(0);
+    }
 
     String localAddress;
     try (ScionDatagramChannel channel = ScionDatagramChannel.open()) {
