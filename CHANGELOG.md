@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+
+- `address` was giving too many address.
+  [#20](https://github.com/netsec-ethz/jpan-cli/pull/20)
+
+### Changed
+
 - Update to JPAN 0.7.0 and improve SCMP error handling.
   [#18](https://github.com/netsec-ethz/jpan-cli/pull/18)
 - Adapt to JPAN 0.7.0 and improve SCMP error handling.
