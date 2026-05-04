@@ -16,12 +16,14 @@ package org.scion.cli.util;
 
 import java.io.IOException;
 import java.net.BindException;
+import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.scion.jpan.*;
+import org.scion.jpan.internal.header.ScmpParser;
 
 public class Prober {
 
@@ -33,14 +35,14 @@ public class Prober {
     // StatusAlive indicates that the expected reply did come back in time.
     Alive,
     // StatusSCMP indicates that an unexpected SCMP packet came in the reply.
-    SCMP;
+    SCMP
   }
 
   private Prober() {}
 
   public static Map<Integer, Status> probe(Integer port, int timeoutMs, List<Path> paths) {
     if (paths.size() == 1 && paths.get(0).getRawPath().length == 0) {
-      // emtpy path
+      // empty path
       Map<Integer, Status> result = new HashMap<>();
       result.put(0, Status.Alive);
       return result;
@@ -102,7 +104,19 @@ public class Prober {
     public void onError(Scmp.ErrorMessage msg) {
       errors.incrementAndGet();
       barrier.countDown();
-      result.put(msg.getSequenceNumber(), Status.SCMP);
+      try {
+        Scmp.Message m2;
+        m2 = ScmpParser.consume(ByteBuffer.wrap(msg.getCause()), (ResponsePath) msg.getPath());
+        Scmp.TypeCode tc = m2.getTypeCode();
+        if (tc == Scmp.TypeCode.TYPE_128 || tc == Scmp.TypeCode.TYPE_130) {
+          if (m2 instanceof Scmp.TimedMessage) {
+            int sn = ((Scmp.TimedMessage) m2).getSequenceNumber();
+            result.put(sn, Status.SCMP);
+          }
+        }
+      } catch (RuntimeException e) {
+        Util.println("Could not decode Scmp Error (" + msg.getTypeCode() + "): " + e.getMessage());
+      }
     }
 
     @Override

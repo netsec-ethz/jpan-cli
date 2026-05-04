@@ -7,51 +7,52 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
--- Nothing yet
+- Update to JPAN 0.7.0 and improve SCMP error handling.
+  [#18](https://github.com/netsec-ethz/jpan-cli/pull/18)
 
 ## [0.2.2] - 2026-03-27
 
 ### Fixed
 
 - Fixed local port option fow showpaths probing, document --healthy-only for ping and traceroute.
-  [#11](https://github.com/netsec-ethz/scion-java-multiping/pull/11)
+  [#11](https://github.com/netsec-ethz/jpan-cli/pull/11)
 - Enable SHIM by default. Fix for #8.
-  [#12](https://github.com/netsec-ethz/scion-java-multiping/pull/12)
+  [#12](https://github.com/netsec-ethz/jpan-cli/pull/12)
 - Improve SCMP error handling.
-  [#13](https://github.com/netsec-ethz/scion-java-multiping/pull/13)
+  [#13](https://github.com/netsec-ethz/jpan-cli/pull/13)
 - Local AS causes exception.
-  [#15](https://github.com/netsec-ethz/scion-java-multiping/pull/15)
+  [#15](https://github.com/netsec-ethz/jpan-cli/pull/15)
 
 ## [0.2.1] - 2026-03-27
 
 ### Fixed
 
 - Fixed showpaths showing wrong path status (of by 1 error).
-  [#9](https://github.com/netsec-ethz/scion-java-multiping/pull/9)
+  [#9](https://github.com/netsec-ethz/jpan-cli/pull/9)
 - Fixed exception when path probes did no return.
-  [#10](https://github.com/netsec-ethz/scion-java-multiping/pull/10)
+  [#10](https://github.com/netsec-ethz/jpan-cli/pull/10)
 
 ## [0.2.0] - 2026-03-17
 
 ### Added
 - Support for --log.level
-  [#4](https://github.com/netsec-ethz/scion-java-multiping/pull/4)
+  [#4](https://github.com/netsec-ethz/jpan-cli/pull/4)
 - Added path probing for showpaths and --no-probe
-  [#5](https://github.com/netsec-ethz/scion-java-multiping/pull/5)
+  [#5](https://github.com/netsec-ethz/jpan-cli/pull/5)
 - Added path probing for ping and --healthy-only
-  [#6](https://github.com/netsec-ethz/scion-java-multiping/pull/6)
+  [#6](https://github.com/netsec-ethz/jpan-cli/pull/6)
 
 ### Fixed
 
 - Fixed showpaths issues.
-  [#2](https://github.com/netsec-ethz/scion-java-multiping/pull/2)
+  [#2](https://github.com/netsec-ethz/jpan-cli/pull/2)
 
 ## [0.1.0] - 2026-03-11
 
 ### Added
 
 - Everything
-  [#1](https://github.com/netsec-ethz/scion-java-multiping/pull/1)
+  [#1](https://github.com/netsec-ethz/jpan-cli/pull/1)
 
 
 ### Changed
