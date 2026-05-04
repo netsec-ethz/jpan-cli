@@ -29,17 +29,8 @@ import org.scion.cli.util.Prober;
 import org.scion.jpan.*;
 
 /**
- * This demo mimics the "scion ping" command available in scionproto (<a
- * href="https://github.com/scionproto/scion">...</a>). This demo also demonstrates different ways
- * of connecting to a network: <br>
- * - JUNIT_MOCK shows how to use the mock network in this library (for JUnit tests) <br>
- * - SCION_PROTO shows how to connect to a local topology from the scionproto go implementation such
- * as "tiny". Note that the constants for "minimal" differ somewhat from the scionproto topology.
- * <br>
- * - PRODUCTION shows different ways how to connect to the production network. Note: While the
- * production network uses the dispatcher, the demo needs to use port 30041.
- *
- * <p>Commented out lines show alternative ways to connect or alternative destinations.
+ * This demo mimics the "scion showpaths" command available in scionproto (<a
+ * href="https://github.com/scionproto/scion">...</a>).
  */
 public class Showpaths {
 

@@ -18,27 +18,18 @@ import static org.scion.cli.util.Util.*;
 
 import java.io.*;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.nio.channels.DatagramChannel;
+import java.util.*;
+import org.scion.cli.util.CliScionService;
 import org.scion.cli.util.Errors;
 import org.scion.cli.util.ExitCodeException;
 import org.scion.jpan.*;
+import org.scion.jpan.internal.bootstrap.LocalAS;
 import org.scion.jpan.internal.util.IPHelper;
 
 /**
- * This demo mimics the "scion ping" command available in scionproto (<a
- * href="https://github.com/scionproto/scion">...</a>). This demo also demonstrates different ways
- * of connecting to a network: <br>
- * - JUNIT_MOCK shows how to use the mock network in this library (for JUnit tests) <br>
- * - SCION_PROTO shows how to connect to a local topology from the scionproto go implementation such
- * as "tiny". Note that the constants for "minimal" differ somewhat from the scionproto topology.
- * <br>
- * - PRODUCTION shows different ways how to connect to the production network. Note: While the
- * production network uses the dispatcher, the demo needs to use port 30041.
- *
- * <p>Commented out lines show alternative ways to connect or alternative destinations.
+ * This demo mimics the "scion address" command available in scionproto (<a
+ * href="https://github.com/scionproto/scion">...</a>).
  */
 public class Address {
 
@@ -50,7 +41,7 @@ public class Address {
     handleExit(() -> new Address().run(args));
   }
 
-  public void run(String... args) throws IOException {
+  public void run(String... args) {
     parseArgs(args);
     if (daemon != null) {
       System.setProperty(Constants.PROPERTY_DAEMON, daemon.toString());
@@ -92,27 +83,47 @@ public class Address {
   }
 
   public static void run() {
-    ScionService service = Scion.defaultService();
-    Iterator<InetAddress> iter = IPHelper.getInterfaceIPs().iterator();
-    boolean found = false;
-    while (iter.hasNext()) {
-      InetAddress ip = iter.next();
-      if (ip.isLoopbackAddress()) {
-        continue;
-      }
-      found = true;
-      String localIP = ip.getHostAddress();
-      if (localIP.contains("%")) {
-        localIP = localIP.substring(0, localIP.indexOf('%'));
-      }
-      if (localIP.contains(":")) {
-        localIP = "[" + localIP + "]";
-      }
-      String isdAs = ScionUtil.toStringIA(service.getLocalIsdAs());
-      println(isdAs + "," + localIP);
+    HashSet<InetAddress> localIPs = new HashSet<>();
+    CliScionService cli = CliScionService.defaultService();
+    LocalAS localAs = cli.getLocalAS();
+    if (localAs.getIsdAses().isEmpty()) {
+      throw new ExitCodeException(1, "No AS detected.");
     }
-    if (!found) {
-      throw new ExitCodeException(1, "No local interfaces detected.");
+    if (localAs.getControlServices().isEmpty()) {
+      throw new ExitCodeException(1, "No control services detected.");
+    }
+
+    for (LocalAS.ServiceNode node : localAs.getControlServices()) {
+      try (DatagramChannel dc = DatagramChannel.open()) {
+        InetSocketAddress addr = IPHelper.toInetSocketAddress(node.getIpString());
+        dc.connect(addr);
+        InetSocketAddress localIP = (InetSocketAddress) dc.getLocalAddress();
+        localIPs.add(localIP.getAddress());
+      } catch (IOException e) {
+        throw new ExitCodeException(1, "Error while determining local address: " + e.getMessage());
+      }
+    }
+
+    boolean found = false;
+    for (long isdAs : localAs.getIsdAses()) {
+      for (InetAddress ip : localIPs) {
+        if (ip.isLoopbackAddress()) {
+          continue;
+        }
+        found = true;
+        String localIP = ip.getHostAddress();
+        if (localIP.contains("%")) {
+          localIP = localIP.substring(0, localIP.indexOf('%'));
+        }
+        if (localIP.contains(":")) {
+          localIP = "[" + localIP + "]";
+        }
+        String isdAsString = ScionUtil.toStringIA(isdAs);
+        println(isdAsString + "," + localIP);
+      }
+      if (!found) {
+        throw new ExitCodeException(1, "No local interfaces detected.");
+      }
     }
   }
 }
