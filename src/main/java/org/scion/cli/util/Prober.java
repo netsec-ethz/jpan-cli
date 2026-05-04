@@ -109,10 +109,8 @@ public class Prober {
         m2 = ScmpParser.consume(ByteBuffer.wrap(msg.getCause()), (ResponsePath) msg.getPath());
         Scmp.TypeCode tc = m2.getTypeCode();
         if (tc == Scmp.TypeCode.TYPE_128 || tc == Scmp.TypeCode.TYPE_130) {
-          if (m2 instanceof Scmp.TimedMessage) {
-            int sn = ((Scmp.TimedMessage) m2).getSequenceNumber();
-            result.put(sn, Status.SCMP);
-          }
+          int sn = ((Scmp.TimedMessage) m2).getSequenceNumber();
+          result.put(sn, Status.SCMP);
         }
       } catch (RuntimeException e) {
         Util.println("Could not decode Scmp Error (" + msg.getTypeCode() + "): " + e.getMessage());

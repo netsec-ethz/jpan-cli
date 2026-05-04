@@ -26,7 +26,7 @@ import org.scion.cli.util.ExitCodeException;
 
 public class Cli {
 
-  private static final String VERSION = "0.2.2 (using JPAN 0.6.1)";
+  private static final String VERSION = "0.3.0-SNAPSHOT (using JPAN 0.7.0)";
 
   public static void main(String... args) {
     System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "ERROR");

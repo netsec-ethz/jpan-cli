@@ -19,7 +19,6 @@ import static org.scion.cli.util.Util.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.scion.cli.util.Errors;
 import org.scion.cli.util.ExitCodeException;
 import org.scion.cli.util.Prober;
@@ -34,7 +33,7 @@ public class Traceroute {
 
   private Integer localPort;
   private boolean startShim = true;
-  private long localIsdAs = 0;
+  private Long localIsdAs;
   private InetAddress localIP = null;
   private ScionAddress dstAddress;
   private String dstUrl;
@@ -130,9 +129,8 @@ public class Traceroute {
     }
 
     if (paths.isEmpty()) {
-      String src = ScionUtil.toStringIA(service.getLocalIsdAs());
       String dst = ScionUtil.toStringIA(dstAddress.getIsdAs());
-      throw new ExitCodeException(2, "No path found from " + src + " to " + dst);
+      throw new ExitCodeException(2, "No path found from " + localIsdAses(service) + " to " + dst);
     }
 
     Path path;
@@ -145,7 +143,7 @@ public class Traceroute {
         }
       }
       if (newPaths.isEmpty()) {
-        String src = ScionUtil.toStringIA(Scion.defaultService().getLocalIsdAs());
+        String src = localIsdAses(service);
         String dst = ScionUtil.toStringIA(dstAddress.getIsdAs());
         throw new ExitCodeException(2, "No path found from " + src + " to " + dst);
       }
@@ -154,6 +152,10 @@ public class Traceroute {
       path = paths.get(0);
     }
 
+    send(path);
+  }
+
+  private void send(Path path) throws IOException {
     String localAddress;
     try (ScionDatagramChannel channel = ScionDatagramChannel.open()) {
       channel.connect(path);
@@ -166,20 +168,18 @@ public class Traceroute {
       builder.setLocalPort(localPort);
     }
     // No concurrency, but must be final
-    AtomicBoolean scmpError = new AtomicBoolean(false);
     try (ScmpSender sender = builder.build()) {
       sender.setTimeOut(timeoutMs);
-      sender.setScmpErrorListener(
+      sender.setScmpErrorHandler(
           e -> {
             println("SCMP Error: " + e.getTypeCode().getText());
-            scmpError.set(true);
+            return false;
           });
       println("Listening on port " + sender.getLocalAddress().getPort() + " ...");
       println("Resolved local address: ");
       println("  " + localAddress);
       printPath(path);
 
-      // TODO this may throw an IOException if external interface is down
       List<Scmp.TracerouteMessage> results = sender.sendTracerouteRequest(path);
       int nTimeouts = 0;
       for (Scmp.TracerouteMessage msg : results) {
@@ -201,24 +201,23 @@ public class Traceroute {
         }
         throw new ExitCodeException(1, "Number of timeouts: " + nTimeouts + msg);
       }
-    } catch (IOException e) {
-      if (scmpError.getAndSet(false)) {
-        // Ignore, we already reported the error
-        return;
-      }
-      throw e;
     }
   }
 
   private static void printPath(Path path) {
     String nl = System.lineSeparator();
-    StringBuilder sb = new StringBuilder();
     // sb.append("Actual local address:").append(nl);
     // sb.append("  ").append(channel.getLocalAddress().getAddress().getHostAddress()).append(nl);
-    sb.append("Using path:").append(nl);
-    sb.append("  Hops: ").append(ScionUtil.toStringPath(path.getMetadata()));
-    sb.append(" MTU: ").append(path.getMetadata().getMtu());
-    sb.append(" NextHop: ").append(path.getMetadata().getInterface().getAddress()).append(nl);
-    println(sb.toString());
+    String sb =
+        "Using path:"
+            + nl
+            + " Hops: "
+            + ScionUtil.toStringPath(path.getMetadata())
+            + " MTU: "
+            + path.getMetadata().getMtu()
+            + " NextHop: "
+            + path.getMetadata().getLocalInterface().getAddress()
+            + nl;
+    println(sb);
   }
 }

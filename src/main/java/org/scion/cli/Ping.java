@@ -20,7 +20,6 @@ import java.io.*;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.scion.cli.util.Errors;
 import org.scion.cli.util.ExitCodeException;
 import org.scion.cli.util.Prober;
@@ -72,7 +71,7 @@ public class Ping {
                 dstAddress.getIsdAs(), dstAddress.getInetAddress(), Constants.SCMP_PORT);
       }
       if (paths.isEmpty()) {
-        String src = ScionUtil.toStringIA(service.getLocalIsdAs());
+        String src = localIsdAses(service);
         String dst = ScionUtil.toStringIA(dstAddress.getIsdAs());
         throw new ExitCodeException(2, "No path found from " + src + " to " + dst);
       }
@@ -158,7 +157,7 @@ public class Ping {
         }
       }
       if (newPaths.isEmpty()) {
-        String src = ScionUtil.toStringIA(Scion.defaultService().getLocalIsdAs());
+        String src = localIsdAses(Scion.defaultService());
         String dst = ScionUtil.toStringIA(dstAddress.getIsdAs());
         throw new ExitCodeException(2, "No path found from " + src + " to " + dst);
       }
@@ -167,6 +166,10 @@ public class Ping {
       path = paths.get(0);
     }
 
+    send(path);
+  }
+
+  private void send(Path path) throws IOException {
     ByteBuffer data = ByteBuffer.allocate(payloadSize);
     for (int i = 0; i < payloadSize; i++) {
       data.put((byte) i);
@@ -184,14 +187,12 @@ public class Ping {
     if (localPort != null) {
       builder.setLocalPort(localPort);
     }
-    // No concurrency, but must be final
-    AtomicBoolean scmpError = new AtomicBoolean(false);
     try (ScmpSender sender = builder.build()) {
       sender.setTimeOut(timeoutMs);
-      sender.setScmpErrorListener(
+      sender.setScmpErrorHandler(
           e -> {
             println("SCMP Error: " + e.getTypeCode().getText());
-            scmpError.set(true);
+            return false;
           });
       println("Listening on port " + sender.getLocalAddress().getPort() + " ...");
       println("Resolved local address: ");
@@ -199,7 +200,6 @@ public class Ping {
       printPath(path);
 
       for (int i = 0; i < count; i++) {
-        // TODO this may throw an IOException if external interface is down
         try {
           Scmp.EchoMessage msg = sender.sendEchoRequest(path, data);
           if (i == 0) {
@@ -220,11 +220,7 @@ public class Ping {
             Util.sleep(intervalMs);
           }
         } catch (IOException e) {
-          if (scmpError.getAndSet(false)) {
-            // Ignore, we already reported the error
-            continue;
-          }
-          throw e;
+          println("Error: " + e.getMessage());
         }
       }
     }
@@ -241,7 +237,7 @@ public class Ping {
     String nl = System.lineSeparator();
     String sb = "Using path:" + nl + "  Hops: " + ScionUtil.toStringPath(path.getMetadata());
     sb += " MTU: " + path.getMetadata().getMtu();
-    sb += " NextHop: " + path.getMetadata().getInterface().getAddress() + nl;
+    sb += " NextHop: " + path.getMetadata().getLocalInterface().getAddress() + nl;
     println(sb);
   }
 

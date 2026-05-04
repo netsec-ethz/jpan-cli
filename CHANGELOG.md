@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Update to JPAN 0.7.0 and improve SCMP error handling.
   [#18](https://github.com/netsec-ethz/jpan-cli/pull/18)
+- Adapt to JPAN 0.7.0 and improve SCMP error handling.
+  [#14](https://github.com/netsec-ethz/jpan-cli/pull/14)
+  [#19](https://github.com/netsec-ethz/jpan-cli/pull/19)
 
 ## [0.2.2] - 2026-03-27
 

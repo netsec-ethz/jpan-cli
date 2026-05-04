@@ -92,6 +92,17 @@ public class Util {
     return Math.round(d * div) / div;
   }
 
+  public static String localIsdAses(ScionService service) {
+    if (service.getLocalIsdAses().isEmpty()) {
+      return "[]";
+    }
+    StringBuilder ret = new StringBuilder("[");
+    for (long ia : service.getLocalIsdAses()) {
+      ret.append(ScionUtil.toStringIA(ia)).append(",");
+    }
+    return ret.substring(0, ret.length() - 1) + "]";
+  }
+
   public static void prepareShim(boolean startShim, Integer port) {
     if (startShim && port != null && port.equals(Constants.SCMP_PORT)) {
       throw new ExitCodeException(
