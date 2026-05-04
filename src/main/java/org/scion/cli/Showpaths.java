@@ -135,7 +135,7 @@ public class Showpaths {
         new InetSocketAddress(InetAddress.getLoopbackAddress(), 12345);
     List<Path> paths = service.getPaths(isdAs, destinationAddress);
     if (paths.isEmpty()) {
-      String src = ScionUtil.toStringIA(service.getLocalIsdAs());
+      String src = localIsdAses(service);
       String dst = ScionUtil.toStringIA(isdAs);
       throw new ExitCodeException(1, "No path found from " + src + " to " + dst);
     }
@@ -217,7 +217,7 @@ public class Showpaths {
   private static String toStringLatency(PathMetadata meta) {
     int latencyMs = 0;
     boolean latencyComplete = true;
-    for (int l : meta.getLatencyList()) {
+    for (int l : meta.getLatencies()) {
       if (l >= 0) {
         latencyMs += l;
       } else {
@@ -234,7 +234,7 @@ public class Showpaths {
   private static String toStringBandwidth(PathMetadata meta) {
     long bw = Long.MAX_VALUE;
     boolean bwComplete = true;
-    for (long l : meta.getBandwidthList()) {
+    for (long l : meta.getBandwidths()) {
       if (l > 0) {
         bw = Math.min(bw, l);
       } else {
@@ -251,7 +251,7 @@ public class Showpaths {
 
   private static String toStringGeo(PathMetadata meta) {
     StringBuilder s = new StringBuilder("[");
-    for (PathMetadata.GeoCoordinates g : meta.getGeoList()) {
+    for (PathMetadata.GeoCoordinates g : meta.getGeoCoordinates()) {
       if (s.length() > 1) {
         s.append(" > ");
       }
@@ -269,7 +269,7 @@ public class Showpaths {
 
   private static String toStringLinkType(PathMetadata meta) {
     StringBuilder s = new StringBuilder("[");
-    for (PathMetadata.LinkType lt : meta.getLinkTypeList()) {
+    for (PathMetadata.LinkType lt : meta.getLinkTypes()) {
       if (s.length() > 1) {
         s.append(", ");
       }
@@ -312,12 +312,12 @@ public class Showpaths {
   private static String toStringNotes(PathMetadata meta) {
     StringBuilder s = new StringBuilder("[");
     int i = 0;
-    for (String note : meta.getNotesList()) {
+    for (String note : meta.getNotes()) {
       if (note != null && !note.isEmpty()) {
         if (s.length() > 1) {
           s.append(", ");
         }
-        long isdAs = meta.getInterfacesList().get(Math.max(0, i * 2 - 1)).getIsdAs();
+        long isdAs = meta.getInterfaces().get(Math.max(0, i * 2 - 1)).getIsdAs();
         s.append(ScionUtil.toStringIA(isdAs));
         s.append(": \"").append(note).append("\"");
       }
