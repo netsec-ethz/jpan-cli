@@ -27,9 +27,9 @@ import org.scion.jpan.Constants;
 import org.scion.jpan.Scion;
 import org.scion.jpan.ScionService;
 import org.scion.jpan.ScionUtil;
-import org.scion.jpan.internal.IPHelper;
 import org.scion.jpan.internal.ScionAddress;
 import org.scion.jpan.internal.Shim;
+import org.scion.jpan.internal.util.IPHelper;
 
 public class Util {
 

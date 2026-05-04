@@ -102,7 +102,7 @@ public class Prober {
     public void onError(Scmp.ErrorMessage msg) {
       errors.incrementAndGet();
       barrier.countDown();
-      result.put(msg.getSequenceNumber(), Status.SCMP);
+      // TODO result.put(msg.getSequenceNumber(), Status.SCMP);
     }
 
     @Override

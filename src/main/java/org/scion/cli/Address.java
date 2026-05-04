@@ -25,7 +25,7 @@ import java.util.List;
 import org.scion.cli.util.Errors;
 import org.scion.cli.util.ExitCodeException;
 import org.scion.jpan.*;
-import org.scion.jpan.internal.IPHelper;
+import org.scion.jpan.internal.util.IPHelper;
 
 /**
  * This demo mimics the "scion ping" command available in scionproto (<a
