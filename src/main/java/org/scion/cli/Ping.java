@@ -226,7 +226,7 @@ public class Ping {
     }
     if (nTimeouts > 0) {
       String msg = "";
-      if (localPort == null || localPort != 30041) {
+      if (nTimeouts == count && (localPort == null || localPort != 30041)) {
         msg = ". Try using \"--port 30041\"";
       }
       throw new ExitCodeException(1, "Number of timeouts: " + nTimeouts + msg);
