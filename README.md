@@ -22,10 +22,10 @@ JPAN-CLI provides several tools:
 ## Usage
 
 The tool can be run from the executable `jar` file which is available in the 
-[GitHub Releases section](https://github.com/netsec-ethz/jpan-cli/releases/download/v0.2.2/jpan-cli.jar)
+[GitHub Releases section](https://github.com/netsec-ethz/jpan-cli/releases/download/v0.3.0/jpan-cli.jar)
 or with:
 
-`wget https://github.com/netsec-ethz/jpan-cli/releases/download/v0.2.2/jpan-cli.jar`.
+`wget https://github.com/netsec-ethz/jpan-cli/releases/download/v0.3.0/jpan-cli.jar`.
 
 It can be executed with:
 

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+- nothing yet
+
+## [0.3.0] - 2026-05-04
+
 ### Fixed
 
 - `address` was giving too many address.
@@ -66,7 +70,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Everything
   [#1](https://github.com/netsec-ethz/jpan-cli/pull/1)
 
-
 ### Changed
 
 - Nothing
@@ -79,7 +82,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Nothing
 
-[Unreleased]: https://github.com/netsec-ethz/jpan-cli/compare/v0.2.2...HEAD
+[Unreleased]: https://github.com/netsec-ethz/jpan-cli/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/netsec-ethz/jpan-cli/compare/v0.2.2...v0.3.0
 [0.2.2]: https://github.com/netsec-ethz/jpan-cli/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/netsec-ethz/jpan-cli/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/netsec-ethz/jpan-cli/compare/v0.1.0...v0.2.0
