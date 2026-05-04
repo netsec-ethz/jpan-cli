@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - `address` was giving too many address.
   [#20](https://github.com/netsec-ethz/jpan-cli/pull/20)
+- Fixed missing `--timeout` for `showpaths`.
+  [#21](https://github.com/netsec-ethz/jpan-cli/pull/21)
 
 ### Changed
 

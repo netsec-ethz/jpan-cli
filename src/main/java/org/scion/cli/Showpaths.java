@@ -42,7 +42,7 @@ public class Showpaths {
   private Long isdAs;
   private boolean extended = false;
   private int maxPaths = 10;
-  private final int timeoutMs = 5000;
+  private int timeoutMs = 5000;
   private boolean probePath = true;
 
   public static void main(String... args) {
@@ -108,6 +108,9 @@ public class Showpaths {
           break;
         case "--sciond":
           daemon = parseAddress("sciond", args);
+          break;
+        case "--timeout":
+          timeoutMs = parseInt("timeout", args);
           break;
         default:
           throw new ExitCodeException(2, Errors.UNKNOWN_OPTION + args.get(0));
