@@ -29,15 +29,24 @@ or with:
 
 It can be executed with:
 
-```
+```bash
 java -jar jpan-cli.jar [tool-command]
 ```
 
 For example, to get command line help, the tool can be executed with:
 
-```
+```bash
 java -jar jpan-cli.jar help
 ```
+
+Or, to run a traceroute to ETH Zurich:
+```bash
+java -jar jpan-cli.jar traceroute 64-2:0:9,0.0.0.0
+```
+A List of registered ASes is available here: 
+https://learn.anapaya.net/docs/resources/assignments/ases/ . 
+Note that many ASes are private and therefore not reachable. 
+ASes in ISD 64 and 71 should mostly be reachable.
 
 # Troubleshooting
 
