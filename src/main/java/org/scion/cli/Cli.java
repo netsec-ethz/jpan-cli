@@ -20,8 +20,7 @@ package org.scion.cli;
 import static org.scion.cli.util.Util.*;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Locale;
+import java.util.*;
 import org.scion.cli.util.ExitCodeException;
 
 public class Cli {
@@ -36,9 +35,10 @@ public class Cli {
   }
 
   public static void run(String... args) throws IOException {
-    checkArgs(args, 1, Integer.MAX_VALUE);
-    String mode = args[0].toLowerCase(Locale.ROOT);
-    String[] newArgs = Arrays.copyOfRange(args, 1, args.length);
+    List<String> argList = new ArrayList<>(Arrays.asList(args));
+    checkArgs(argList, 1, Integer.MAX_VALUE);
+    String mode = argList.remove(0).toLowerCase(Locale.ROOT);
+    String[] newArgs = argList.toArray(new String[0]);
     switch (mode) {
       case "address":
         new Address().run(newArgs);
@@ -72,11 +72,25 @@ public class Cli {
     }
   }
 
-  private static void checkArgs(String[] args, int minArgs, int maxArgs) {
-    if (args.length < minArgs || args.length > maxArgs) {
+  private static void checkArgs(List<String> args, int minArgs, int maxArgs) {
+    if (args.size() < minArgs || args.size() > maxArgs) {
       println("Invalid number of arguments.");
       printUsage();
       throw new ExitCodeException(2, "Invalid number of arguments.");
+    }
+    // Loglevel must be set before starting tha application.
+    for (Iterator<String> it = args.iterator(); it.hasNext(); ) {
+      String arg = it.next();
+      if ("-v".equals(arg)) {
+        System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "WARN");
+        it.remove();
+      } else if ("-vv".equals(arg)) {
+        System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO");
+        it.remove();
+      } else if ("-vvv".equals(arg)) {
+        System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "DEBUG");
+        it.remove();
+      }
     }
   }
 
@@ -122,7 +136,8 @@ public class Cli {
     println("  version           Show the SCION version information");
     println("");
     println("Flags:");
-    println("  -h, --help   help for jpan-cli");
+    println("  -h, --help   Help for jpan-cli");
+    println("  -v, -vv, -vvv   Verbose output");
     println("");
     println("Use \"jpan-cli [command] --help\" for more information about a command.");
   }

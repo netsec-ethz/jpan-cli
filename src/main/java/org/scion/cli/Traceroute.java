@@ -208,6 +208,10 @@ public class Traceroute {
     String nl = System.lineSeparator();
     // sb.append("Actual local address:").append(nl);
     // sb.append("  ").append(channel.getLocalAddress().getAddress().getHostAddress()).append(nl);
+    String nextHop = "unknown";
+    if (path.getMetadata() != null && path.getMetadata().getLocalInterface() != null) {
+      nextHop = path.getMetadata().getLocalInterface().getAddress();
+    }
     String sb =
         "Using path:"
             + nl
@@ -216,7 +220,7 @@ public class Traceroute {
             + " MTU: "
             + path.getMetadata().getMtu()
             + " NextHop: "
-            + path.getMetadata().getLocalInterface().getAddress()
+            + nextHop
             + nl;
     println(sb);
   }
