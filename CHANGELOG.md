@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - nothing yet
 
+### Added
+
+- Alternative log level support via `-v`, `-vv`, `-vvv`
+  [#23](https://github.com/netsec-ethz/jpan-cli/pull/23)
+
 ## [0.3.0] - 2026-05-04
 
 ### Fixed
