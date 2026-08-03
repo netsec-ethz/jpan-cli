@@ -137,7 +137,6 @@ public class Cli {
     println("");
     println("Flags:");
     println("  -h, --help   Help for jpan-cli");
-    println("  -v, -vv, -vvv   Verbose output");
     println("");
     println("Use \"jpan-cli [command] --help\" for more information about a command.");
   }
@@ -164,6 +163,7 @@ public class Cli {
     println(
         "      --log.level string       Console logging level verbosity (debug|info|warn|error)");
     println("      --sciond string          SCION Daemon address. (default \"127.0.0.1:30255\")");
+    println("  -v, -vv, -vvv   Verbose output");
   }
 
   static void printUsagePing() {
@@ -227,6 +227,7 @@ public class Cli {
     // println("      --shim                   start with SHIM enabled (default disabled).");
     println("      --timeout uint16         timeout per packet in milliseconds (default 1s)");
     println("      --url url                use and resolve a url as destination address");
+    println("  -v, -vv, -vvv   Verbose output");
   }
 
   static void printUsageTraceroute() {
@@ -272,6 +273,7 @@ public class Cli {
     //    println("      --shim                   start with SHIM enabled (default disabled).");
     println("      --timeout uint16         timeout per packet in milliseconds (default 1s)");
     println("      --url url                use and resolve a url as destination address");
+    println("  -v, -vv, -vvv   Verbose output");
   }
 
   static void printUsageShowpaths() {
@@ -329,6 +331,7 @@ public class Cli {
     //    println("      --sequence string        Space separated list of hop predicates");
     println("      --timeout uint16         Probing timeout in milliseconds (default 5s)");
     //    println("      --tracing.agent string   Tracing agent address");
+    println("  -v, -vv, -vvv   Verbose output");
   }
 
   static void printUsagePingResponder() {
@@ -352,6 +355,7 @@ public class Cli {
     println(
         "      --log.level string       Console logging level verbosity (debug|info|warn|error)");
     println("      --port uint16            use specified local port.");
+    println("  -v, -vv, -vvv   Verbose output");
   }
 
   private static void printSequenceHelp() {
