@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   [#23](https://github.com/netsec-ethz/jpan-cli/pull/23)
   [#24](https://github.com/netsec-ethz/jpan-cli/pull/24)
 - Improved error output
-  [#24](https://github.com/netsec-ethz/jpan-cli/pull/24)
+  [#25](https://github.com/netsec-ethz/jpan-cli/pull/25)
 
 ## [0.3.0] - 2026-05-04
 
