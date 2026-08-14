@@ -22,6 +22,7 @@ import static org.scion.cli.util.Util.*;
 import java.io.IOException;
 import java.util.*;
 import org.scion.cli.util.ExitCodeException;
+import org.scion.cli.util.Util;
 
 public class Cli {
 
@@ -83,12 +84,15 @@ public class Cli {
       String arg = it.next();
       if ("-v".equals(arg)) {
         System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "WARN");
+        Util.PRINT_STACKTRACE = true;
         it.remove();
       } else if ("-vv".equals(arg)) {
         System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO");
+        Util.PRINT_STACKTRACE = true;
         it.remove();
       } else if ("-vvv".equals(arg)) {
         System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "DEBUG");
+        Util.PRINT_STACKTRACE = true;
         it.remove();
       }
     }
