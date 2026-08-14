@@ -22,8 +22,6 @@ import static org.scion.cli.util.Util.*;
 import java.io.IOException;
 import java.util.*;
 import org.scion.cli.util.ExitCodeException;
-import org.scion.cli.util.Util;
-import org.scion.jpan.Constants;
 
 public class Cli {
 
@@ -31,10 +29,8 @@ public class Cli {
 
   public static void main(String... args) {
     System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "ERROR");
-    // System.setProperty(Constants.PROPERTY_BOOTSTRAP_HOST, "[10.1.1.11]:8041");
-    System.setProperty(Constants.PROPERTY_BOOTSTRAP_HOST, "2001:067c:1230:0601:020d:b9ff:fe47");
-    // handleExit(() -> run(args));
-    handleExit(() -> run(new String[] {"traceroute", "66-2:0:18,10.0.0.1"}));
+    handleExit(() -> run(args));
+    // handleExit(() -> run(new String[] {"traceroute", "66-2:0:18,10.0.0.1"}));
     // handleExit(() -> run(new String[] {"showpaths", "67-401500"}));
   }
 
@@ -87,15 +83,12 @@ public class Cli {
       String arg = it.next();
       if ("-v".equals(arg)) {
         System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "WARN");
-        Util.PRINT_STACKTRACE = true;
         it.remove();
       } else if ("-vv".equals(arg)) {
         System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO");
-        Util.PRINT_STACKTRACE = true;
         it.remove();
       } else if ("-vvv".equals(arg)) {
         System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "DEBUG");
-        Util.PRINT_STACKTRACE = true;
         it.remove();
       }
     }

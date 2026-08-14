@@ -35,7 +35,6 @@ public class Util {
 
   public static boolean PRINT = true;
   public static boolean DELAYED_PRINT = false; // print only at newlines
-  public static boolean PRINT_STACKTRACE = false;
   private static final StringBuilder sb = new StringBuilder();
   private static Supplier<ScionService> serviceSupplier = Scion::defaultService;
 
@@ -131,20 +130,9 @@ public class Util {
       if (e.getMessage() != null && !e.getMessage().isEmpty()) {
         println(e.getMessage());
       }
-      if (PRINT_STACKTRACE) {
-        e.printStackTrace();
-      }
       System.exit(e.exitCode());
     } catch (Exception e) {
-      if (PRINT_STACKTRACE) {
-        e.printStackTrace();
-      } else {
-        Throwable t = e;
-        while (t != null) {
-          println("Error: " + t.getMessage());
-          t = t.getCause();
-        }
-      }
+      e.printStackTrace();
       System.exit(2);
     }
   }
