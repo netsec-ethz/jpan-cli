@@ -24,7 +24,7 @@ class CliTest {
   @Test
   void error_noCommand() {
     ExitCodeException e;
-    e = assertThrows(ExitCodeException.class, () -> Cli.run());
+    e = assertThrows(ExitCodeException.class, Cli::run);
     assertEquals(2, e.exitCode());
     assertTrue(e.getMessage().contains("Invalid number of arguments."));
   }

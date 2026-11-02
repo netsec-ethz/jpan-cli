@@ -152,7 +152,7 @@ public class Ping {
       Map<Integer, Prober.Status> isActive = Prober.probe(localPort, timeoutMs, paths);
       List<Path> newPaths = new ArrayList<>();
       for (int i = 0; i < paths.size(); i++) {
-        if (isActive.getOrDefault(i, Prober.Status.Unknown) == Prober.Status.Alive) {
+        if (isActive.getOrDefault(i, Prober.Status.UNKNOWN) == Prober.Status.ALIVE) {
           newPaths.add(paths.get(i));
         }
       }
@@ -177,7 +177,7 @@ public class Ping {
 
     String localAddress;
     try (ScionDatagramChannel channel = ScionDatagramChannel.open()) {
-      channel.connect(path);
+      channel.connect(path.getRemoteSocketAddress());
       // We determine the address separately because SCMP will always have 0.0.0.0 as local address
       localAddress = channel.getLocalAddress().getAddress().getHostAddress();
     }
@@ -237,7 +237,7 @@ public class Ping {
     String nl = System.lineSeparator();
     String sb = "Using path:" + nl + "  Hops: " + ScionUtil.toStringPath(path.getMetadata());
     sb += " MTU: " + path.getMetadata().getMtu();
-    sb += " NextHop: " + path.getMetadata().getLocalInterface().getAddress() + nl;
+    sb += " NextHop: " + path.getFirstHopAddress() + nl;
     println(sb);
   }
 

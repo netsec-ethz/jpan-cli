@@ -94,11 +94,11 @@ public class Util {
   }
 
   public static String localIsdAses(ScionService service) {
-    if (service.getLocalIsdAses().isEmpty()) {
+    if (service.getLocalIsdAsList().isEmpty()) {
       return "[]";
     }
     StringBuilder ret = new StringBuilder("[");
-    for (long ia : service.getLocalIsdAses()) {
+    for (long ia : service.getLocalIsdAsList()) {
       ret.append(ScionUtil.toStringIA(ia)).append(",");
     }
     return ret.substring(0, ret.length() - 1) + "]";

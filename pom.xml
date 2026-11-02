@@ -83,7 +83,7 @@
         <dependency>
             <groupId>org.scion</groupId>
             <artifactId>jpan</artifactId>
-            <version>0.7.0</version>
+            <version>0.8.1</version>
         </dependency>
     </dependencies>
 
@@ -290,6 +290,10 @@
                                             <excludes>
                                                 <exclude>META-INF/MANIFEST.MF</exclude>
                                                 <exclude>**/module-info.class</exclude>
+                                                <!-- Exclude signatures from signed jars -->
+                                                <exclude>META-INF/*.SF</exclude>
+                                                <exclude>META-INF/*.DSA</exclude>
+                                                <exclude>META-INF/*.RSA</exclude>
                                             </excludes>
                                         </filter>
                                     </filters>

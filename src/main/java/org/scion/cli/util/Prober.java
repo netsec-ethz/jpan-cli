@@ -29,13 +29,13 @@ public class Prober {
 
   public enum Status {
     // StatusUnknown indicates that it is not clear what state the path is in.
-    Unknown,
+    UNKNOWN,
     // StatusTimeout indicates that a reply did come back in time for the path.
-    Timeout,
+    TIMEOUT,
     // StatusAlive indicates that the expected reply did come back in time.
-    Alive,
+    ALIVE,
     // StatusSCMP indicates that an unexpected SCMP packet came in the reply.
-    SCMP
+    UNEXPECTED_SCMP
   }
 
   private Prober() {}
@@ -44,7 +44,7 @@ public class Prober {
     if (paths.size() == 1 && paths.get(0).getRawPath().length == 0) {
       // empty path
       Map<Integer, Status> result = new HashMap<>();
-      result.put(0, Status.Alive);
+      result.put(0, Status.ALIVE);
       return result;
     }
 
@@ -91,13 +91,13 @@ public class Prober {
     @Override
     public void onResponse(Scmp.TimedMessage msg) {
       barrier.countDown();
-      result.put(msg.getSequenceNumber(), Status.Alive);
+      result.put(msg.getSequenceNumber(), Status.ALIVE);
     }
 
     @Override
     public void onTimeout(Scmp.TimedMessage msg) {
       barrier.countDown();
-      result.put(msg.getSequenceNumber(), Status.Timeout);
+      result.put(msg.getSequenceNumber(), Status.TIMEOUT);
     }
 
     @Override
@@ -110,7 +110,7 @@ public class Prober {
         Scmp.TypeCode tc = m2.getTypeCode();
         if (tc == Scmp.TypeCode.TYPE_128 || tc == Scmp.TypeCode.TYPE_130) {
           int sn = ((Scmp.TimedMessage) m2).getSequenceNumber();
-          result.put(sn, Status.SCMP);
+          result.put(sn, Status.UNEXPECTED_SCMP);
         }
       } catch (RuntimeException e) {
         Util.println("Could not decode Scmp Error (" + msg.getTypeCode() + "): " + e.getMessage());

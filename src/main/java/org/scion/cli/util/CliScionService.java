@@ -237,7 +237,7 @@ public class CliScionService {
     }
   }
 
-  public Set<Long> getLocalIsdAses() {
+  public List<Long> getLocalIsdAses() {
     return localAS.getIsdAses();
   }
 
