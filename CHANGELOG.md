@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Update to JPAN 0.8.1
   [#26](https://github.com/netsec-ethz/jpan-cli/pull/26)
+- Update dependencies and plugins
+  [#27](https://github.com/netsec-ethz/jpan-cli/pull/27)
 
 ## [0.3.0] - 2026-05-04
 
