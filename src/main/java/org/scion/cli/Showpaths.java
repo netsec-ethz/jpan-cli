@@ -147,14 +147,14 @@ public class Showpaths {
       Path path = paths.get(id);
       String detectedLocalIP;
       try (ScionDatagramChannel channel = ScionDatagramChannel.open()) {
-        channel.connect(path);
+        channel.connect(path.getRemoteSocketAddress());
         detectedLocalIP = channel.getLocalAddress().getAddress().getHostAddress();
       }
       PathMetadata meta = path.getMetadata();
       String header = "[" + id + "] Hops: " + ScionUtil.toStringPath(meta);
       if (extended) {
         println(header);
-        printExtended(path, detectedLocalIP, isActive.getOrDefault(id, Prober.Status.Unknown));
+        printExtended(path, detectedLocalIP, isActive.getOrDefault(id, Prober.Status.UNKNOWN));
       } else {
         String compact =
             " MTU: "
@@ -164,14 +164,14 @@ public class Showpaths {
                 + ":"
                 + path.getFirstHopAddress().getPort();
         if (probePath) {
-          compact += " Status: " + isActive.getOrDefault(id, Prober.Status.Unknown);
+          compact += " Status: " + isActive.getOrDefault(id, Prober.Status.UNKNOWN);
         }
         compact += " LocalIP: " + detectedLocalIP;
         println(header + compact);
       }
     }
 
-    if (probePath && !isActive.containsValue(Prober.Status.Alive)) {
+    if (probePath && !isActive.containsValue(Prober.Status.ALIVE)) {
       throw new ExitCodeException(
           2, "Error: no path alive. See documentation for possible solutions.");
     }

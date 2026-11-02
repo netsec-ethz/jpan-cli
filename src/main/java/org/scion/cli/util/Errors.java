@@ -15,6 +15,10 @@
 package org.scion.cli.util;
 
 public class Errors {
+  private Errors() {
+    /* This utility class should not be instantiated */
+  }
+
   public static final String PARSING_ADDRESS = "ERROR parsing address: ";
   public static final String UNEXPECTED_NON_FLAG = "Unexpected non-flag arguments: ";
   public static final String UNKNOWN_OPTION = "Unknown option: ";

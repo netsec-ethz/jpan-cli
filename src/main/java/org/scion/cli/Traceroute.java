@@ -138,7 +138,7 @@ public class Traceroute {
       Map<Integer, Prober.Status> isActive = Prober.probe(localPort, timeoutMs, paths);
       List<Path> newPaths = new ArrayList<>();
       for (int i = 0; i < paths.size(); i++) {
-        if (isActive.getOrDefault(i, Prober.Status.Unknown) == Prober.Status.Alive) {
+        if (isActive.getOrDefault(i, Prober.Status.UNKNOWN) == Prober.Status.ALIVE) {
           newPaths.add(paths.get(i));
         }
       }
@@ -158,7 +158,7 @@ public class Traceroute {
   private void send(Path path) throws IOException {
     String localAddress;
     try (ScionDatagramChannel channel = ScionDatagramChannel.open()) {
-      channel.connect(path);
+      channel.connect(path.getRemoteSocketAddress());
       // We determine the address separately because SCMP will always have 0.0.0.0 as local address
       localAddress = channel.getLocalAddress().getAddress().getHostAddress();
     }
@@ -209,8 +209,8 @@ public class Traceroute {
     // sb.append("Actual local address:").append(nl);
     // sb.append("  ").append(channel.getLocalAddress().getAddress().getHostAddress()).append(nl);
     String nextHop = "unknown";
-    if (path.getMetadata() != null && path.getMetadata().getLocalInterface() != null) {
-      nextHop = path.getMetadata().getLocalInterface().getAddress();
+    if (path.getFirstHopAddress() != null) {
+      nextHop = path.getFirstHopAddress().toString();
     }
     String sb =
         "Using path:"
