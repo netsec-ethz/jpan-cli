@@ -52,6 +52,10 @@
         <url>https://github.com/netsec-ethz/jpan-cli/issues</url>
     </issueManagement>
 
+    <prerequisites>
+        <maven>3.6.3</maven>
+    </prerequisites>
+
     <!-- mvn versions:display-dependency-updates -->
     <dependencies>
         <dependency>
