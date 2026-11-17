@@ -23,6 +23,8 @@ TODO
   [#24](https://github.com/netsec-ethz/jpan-cli/pull/24)
 - Improved error output
   [#25](https://github.com/netsec-ethz/jpan-cli/pull/25)
+- SNAP command line options
+  [#29](https://github.com/netsec-ethz/jpan-cli/pull/29)
 
 ### Changed
 

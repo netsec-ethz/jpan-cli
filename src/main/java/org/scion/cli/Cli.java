@@ -20,16 +20,21 @@ package org.scion.cli;
 import static org.scion.cli.util.Util.*;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import org.scion.cli.util.ExitCodeException;
 import org.scion.cli.util.Util;
+import org.scion.jpan.Constants;
+import org.slf4j.simple.SimpleLogger;
 
 public class Cli {
 
   private static final String VERSION = "0.3.0-SNAPSHOT (using JPAN 0.7.0)";
 
   public static void main(String... args) {
-    System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "ERROR");
+    System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "ERROR");
     handleExit(() -> run(args));
     // handleExit(() -> run(new String[] {"traceroute", "66-2:0:18,10.0.0.1"}));
     // handleExit(() -> run(new String[] {"showpaths", "67-401500"}));
@@ -79,22 +84,79 @@ public class Cli {
       printUsage();
       throw new ExitCodeException(2, "Invalid number of arguments.");
     }
-    // Loglevel must be set before starting tha application.
+    checkVerbosity(args);
+    checkSnap(args);
+  }
+
+  private static void checkVerbosity(List<String> args) {
+    // Loglevel must be set before starting the application.
     for (Iterator<String> it = args.iterator(); it.hasNext(); ) {
       String arg = it.next();
       if ("-v".equals(arg)) {
-        System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "WARN");
+        System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "WARN");
         Util.PRINT_STACKTRACE = true;
         it.remove();
       } else if ("-vv".equals(arg)) {
-        System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO");
+        System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO");
         Util.PRINT_STACKTRACE = true;
         it.remove();
       } else if ("-vvv".equals(arg)) {
-        System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "DEBUG");
+        System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "DEBUG");
         Util.PRINT_STACKTRACE = true;
         it.remove();
       }
+    }
+  }
+
+  private static void checkSnap(List<String> args) {
+    for (Iterator<String> it = args.iterator(); it.hasNext(); ) {
+      String arg = it.next();
+      if ("--snap-key-file".equals(arg) || "--snap-key".equals(arg)) {
+        it.remove();
+        if (!it.hasNext()) {
+          throw new ExitCodeException(2, "Missing argument after: " + arg);
+        }
+        String key;
+        if ("--snap-key-file".equals(arg)) {
+          key = readAuthKeyFile(it.next());
+        } else {
+          key = it.next();
+        }
+        it.remove();
+        System.setProperty(Constants.PROPERTY_UNDERLAY_MODE, "snap");
+        System.setProperty(Constants.PROPERTY_SNAP_AUTH_KEY, key);
+      }
+      if ("--snap-auth-service".equals(arg)) {
+        it.remove();
+        if (!it.hasNext()) {
+          throw new ExitCodeException(2, "Missing argument after: " + arg);
+        }
+        System.setProperty(Constants.PROPERTY_UNDERLAY_MODE, "snap");
+        System.setProperty(Constants.PROPERTY_SNAP_AUTH_SERVICE, it.next());
+        it.remove();
+      }
+      // Not strictly a SNAP property...
+      if ("--path-service-discovery".equals(arg)) {
+        it.remove();
+        if (!it.hasNext()) {
+          throw new ExitCodeException(2, "Missing argument after: " + arg);
+        }
+        System.setProperty(Constants.PROPERTY_SNAP_PATH_SERVICE_DISCOVERY, it.next());
+        it.remove();
+      }
+    }
+  }
+
+  private static String readAuthKeyFile(String authKeyFile) {
+    try {
+      String authKey =
+          new String(Files.readAllBytes(Paths.get(authKeyFile)), StandardCharsets.UTF_8).trim();
+      if (authKey.isEmpty()) {
+        throw new IllegalArgumentException("Auth key file is empty: " + authKeyFile);
+      }
+      return authKey;
+    } catch (IOException e) {
+      throw new ExitCodeException(2, "While reading auth key file: " + e.getMessage());
     }
   }
 
@@ -138,11 +200,20 @@ public class Cli {
     println("  showpaths         Display paths to a SCION AS");
     println("  traceroute        Trace the SCION route to a remote SCION AS using SCMP traceroute");
     println("  version           Show the SCION version information");
-    println("");
-    println("Flags:");
-    println("  -h, --help   Help for jpan-cli");
+    printUsageCommon();
     println("");
     println("Use \"jpan-cli [command] --help\" for more information about a command.");
+  }
+
+  private static void printUsageCommon() {
+    println("");
+    println("General options:");
+    println("  -h, --help                     General help or help specific for each cpommand.");
+    println("      --path-service-discovery   Domain name of path service discovery service.");
+    println("      --snap-auth-key            SNAP API authentication key.");
+    println("      --snap-auth-key-file       Path to file with SNAP API authentication key.");
+    println("      --snap-auth-service        Domain name of SNAP authentication service.");
+    println("  -v, -vv, -vvv                  Verbose output");
   }
 
   private static void printUsageAddress() {
@@ -160,14 +231,13 @@ public class Cli {
     println("  jpan-cli address");
     println("");
     println("Flags:");
-    println("  -h, --help                   help for address");
     // println("      --isd-as isd-as   The local ISD-AS to use. (default 0-0)");
     // println("      --json            Write the output as machine readable json");
     println("  -l, --local ip               Local IP address to listen on. (default invalid IP)");
     println(
         "      --log.level string       Console logging level verbosity (debug|info|warn|error)");
     println("      --sciond string          SCION Daemon address. (default \"127.0.0.1:30255\")");
-    println("  -v, -vv, -vvv   Verbose output");
+    printUsageCommon();
   }
 
   static void printUsagePing() {
@@ -231,7 +301,7 @@ public class Cli {
     // println("      --shim                   start with SHIM enabled (default disabled).");
     println("      --timeout uint16         timeout per packet in milliseconds (default 1s)");
     println("      --url url                use and resolve a url as destination address");
-    println("  -v, -vv, -vvv   Verbose output");
+    printUsageCommon();
   }
 
   static void printUsageTraceroute() {
@@ -261,7 +331,6 @@ public class Cli {
     //    println("      --format string          Specify the output format (human|json|yaml)
     // (default \"human\")");
     println("      --healthy-only           only use healthy paths");
-    println("  -h, --help                   help for traceroute");
     //    println("  -i, --interactive            interactive mode");
     //    println("      --isd-as isd-as          The local ISD-AS to use. (default 0-0)");
     //    println("  -l, --local ip               Local IP address to listen on. (default invalid
@@ -277,7 +346,7 @@ public class Cli {
     //    println("      --shim                   start with SHIM enabled (default disabled).");
     println("      --timeout uint16         timeout per packet in milliseconds (default 1s)");
     println("      --url url                use and resolve a url as destination address");
-    println("  -v, -vv, -vvv   Verbose output");
+    printUsageCommon();
   }
 
   static void printUsageShowpaths() {
@@ -319,7 +388,6 @@ public class Cli {
     //    println(
     //        "      --format string          Specify the output format (human|json|yaml) (default
     // \"human\")");
-    println("  -h, --help                   help for showpaths");
     //    println("      --isd-as isd-as          The local ISD-AS to use. (default 0-0)");
     println("  -l, --local ip               Local IP address to listen on. (default invalid IP)");
     println(
@@ -335,7 +403,7 @@ public class Cli {
     //    println("      --sequence string        Space separated list of hop predicates");
     println("      --timeout uint16         Probing timeout in milliseconds (default 5s)");
     //    println("      --tracing.agent string   Tracing agent address");
-    println("  -v, -vv, -vvv   Verbose output");
+    printUsageCommon();
   }
 
   static void printUsagePingResponder() {
@@ -359,7 +427,7 @@ public class Cli {
     println(
         "      --log.level string       Console logging level verbosity (debug|info|warn|error)");
     println("      --port uint16            use specified local port.");
-    println("  -v, -vv, -vvv   Verbose output");
+    printUsageCommon();
   }
 
   private static void printSequenceHelp() {

@@ -48,6 +48,17 @@ https://learn.anapaya.net/docs/resources/assignments/ases/ .
 Note that many ASes are private and therefore not reachable. 
 ASes in ISD 64 and 71 should mostly be reachable.
 
+### SNAP support
+
+Snap can be configured via standard JPAN properties or environment variables, or with some of the command line options, e.g.:
+```shell
+$ java -jar target/jpan-cli.jar traceroute <ISD-AS>,0.0.0.0 --snap-key-file <path to file with key> --snap-auth-service auth.scion.anapaya.net --path-service-discovery https://discovery.scion.anapaya.net
+```
+or directly with the API key: 
+```shell
+$ java -jar target/jpan-cli.jar traceroute <ISD-AS>,0.0.0.0 --snap-key <key string> --snap-auth-service auth.scion.anapaya.net --path-service-discovery https://discovery.scion.anapaya.net
+```
+
 # Troubleshooting
 
 ## No ping/traceroute answers received
