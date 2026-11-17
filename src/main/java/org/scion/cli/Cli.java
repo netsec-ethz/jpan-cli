@@ -31,7 +31,7 @@ import org.slf4j.simple.SimpleLogger;
 
 public class Cli {
 
-  private static final String VERSION = "0.3.0-SNAPSHOT (using JPAN 0.7.0)";
+  private static final String VERSION = "0.4.0-SNAPSHOT (JPAN 0.8.2)";
 
   public static void main(String... args) {
     System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "ERROR");
