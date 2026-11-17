@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - nothing yet
 
+## [0.4.0] - 2026-11-03
+
+TODO
+- Why do we need to specify SCION_SNAP_PS_DISCOVERY?
+- Migrate to ScionServiceMock
+- 
+
 ### Added
 
 - Alternative log level support via `-v`, `-vv`, `-vvv`
@@ -23,6 +30,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   [#26](https://github.com/netsec-ethz/jpan-cli/pull/26)
 - Update dependencies and plugins
   [#27](https://github.com/netsec-ethz/jpan-cli/pull/27)
+- Use new JPAN 0.8.2 ScionService
+  [#28](https://github.com/netsec-ethz/jpan-cli/pull/28)
 
 ## [0.3.0] - 2026-05-04
 
